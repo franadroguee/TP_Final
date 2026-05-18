@@ -1,45 +1,49 @@
 import pygame
 
-pygame.init()
-pantalla = pygame.display.set_mode((930, 840))
-playing = True
-clock = pygame.time.Clock()
-
-# graficos
-pared = pygame.image.load('graficos\pared.png')
-pasillo = pygame.image.load('graficos\pasillo.png')
-power = pygame.image.load('graficos\powerpellet.png')
-puerta = pygame.image.load('graficos\puerta.png')
-punto = pygame.image.load('graficos\punto.png')
-
-
-def mapa(ruta_archivo: str) -> dict:
+def mapa(ruta_archivo: str, pantalla) -> dict:
+    '''
+    Recibe la ruta del archivo del mapa y lo analiza. Segun corresponda, inserta en la ventana de PyGame, el .png del grafico que corresponda y ademas devuelve un diccionario con la informacion de todo el mapa en formato key=(x, y) value=str.
+    
+    args:
+        ruta_archivo
+    returns:
+        dict
+    '''
+    
+    # graficos
+    pared = pygame.image.load('graficos\pared.png')
+    pasillo = pygame.image.load('graficos\pasillo.png')
+    power = pygame.image.load('graficos\powerpellet.png')
+    puerta = pygame.image.load('graficos\puerta.png')
+    punto = pygame.image.load('graficos\punto.png')
+    tunel = pygame.image.load('graficos\gtunel.png')
+    
     x = 0
     y = 0
     dic_mapa = {}
     with open(ruta_archivo, 'r') as mapa:
         for fila in mapa:
             for letra in fila:
-                if letra == 'X':
-                    pantalla.blit(pared, ((x * 30), (y * 30)))
-                    dic_mapa[(x, y)] = 'pared'
-                elif letra == '.':
-                    pantalla.blit(punto, ((x * 30), (y * 30)))
+                if letra == 'X': # pared
+                    pantalla.blit(pared, ((x * 25), (y * 25))) # carga el grafico
+                    dic_mapa[(x, y)] = 'pared' # adjunta la pos. al diccionario
+                elif letra == '.': # punto
+                    pantalla.blit(punto, ((x * 25), (y * 25)))
                     dic_mapa[(x, y)] = 'punto'
-                elif letra == ' ':
-                    pantalla.blit(pasillo, ((x * 30), (y * 30)))
+                elif letra == ' ': # pasillo
+                    pantalla.blit(pasillo, ((x * 25), (y * 25)))
                     dic_mapa[(x, y)] = 'pasillo'
-                elif letra == 'G':
-                    pantalla.blit(pasillo, ((x * 30), (y * 30)))
+                elif letra == 'G': # Ghost house
+                    pantalla.blit(pasillo, ((x * 25), (y * 25)))
                     dic_mapa[(x, y)] = 'ghost'
-                elif letra == 'o':
-                    pantalla.blit(power, ((x * 30), (y * 30)))
+                elif letra == 'o': # PowerPellet
+                    pantalla.blit(power, ((x * 25), (y * 25)))
                     dic_mapa[(x, y)] = 'powerpellet'
-                elif letra == '-':
-                    pantalla.blit(puerta, ((x * 30), (y * 30)))
+                elif letra == '-': # puerta ghost house
+                    pantalla.blit(puerta, ((x * 25), (y * 25)))
                     dic_mapa[(x, y)] = 'puerta'
-                elif letra == 'T':
-                    pantalla.blit(puerta, ((x * 30), (y * 30)))
+                elif letra == 'T': # tunel lateral
+                    pantalla.blit(tunel, ((x * 25), (y * 25)))
                     dic_mapa[(x, y)] = 'tunel'
                 elif letra == 'P':
                     dic_mapa[(x, y)] = 'inicio'
@@ -48,10 +52,3 @@ def mapa(ruta_archivo: str) -> dict:
             y += 1
     pygame.display.update()
     return dic_mapa
-
-while playing:
-    dic_mapa = mapa('mapa.txt')  
-    for event in pygame.event.get():    
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            playing = False
