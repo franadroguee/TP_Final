@@ -4,7 +4,7 @@ from entidades import pacman
 
 # inicializacion de pygame
 pygame.init()
-pantalla = pygame.display.set_mode((700, 775))
+pantalla = pygame.display.set_mode((560, 775))
 playing = True
 clock = pygame.time.Clock()
 

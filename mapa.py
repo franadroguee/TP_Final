@@ -19,31 +19,31 @@ def mapa(ruta_archivo: str, pantalla) -> dict:
     tunel = pygame.image.load('graficos\gtunel.png')
     
     x = 0
-    y = 0
+    y = 3
     dic_mapa = {}
     with open(ruta_archivo, 'r') as mapa:
         for fila in mapa:
             for letra in fila:
                 if letra == 'X': # pared
-                    pantalla.blit(pared, ((x * 25), (y * 25))) # carga el grafico
+                    pantalla.blit(pared, ((x * 20), (y * 20))) # carga el grafico
                     dic_mapa[(x, y)] = 'pared' # adjunta la pos. al diccionario
                 elif letra == '.': # punto
-                    pantalla.blit(punto, ((x * 25), (y * 25)))
+                    pantalla.blit(punto, ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'punto'
                 elif letra == ' ': # pasillo
-                    pantalla.blit(pasillo, ((x * 25), (y * 25)))
+                    pantalla.blit(pasillo, ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'pasillo'
                 elif letra == 'G': # Ghost house
-                    pantalla.blit(pasillo, ((x * 25), (y * 25)))
+                    pantalla.blit(pasillo, ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'ghost'
                 elif letra == 'o': # PowerPellet
-                    pantalla.blit(power, ((x * 25), (y * 25)))
+                    pantalla.blit(power, ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'powerpellet'
                 elif letra == '-': # puerta ghost house
-                    pantalla.blit(puerta, ((x * 25), (y * 25)))
+                    pantalla.blit(puerta, ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'puerta'
                 elif letra == 'T': # tunel lateral
-                    pantalla.blit(tunel, ((x * 25), (y * 25)))
+                    pantalla.blit(tunel, ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'tunel'
                 elif letra == 'P':
                     dic_mapa[(x, y)] = 'inicio'
