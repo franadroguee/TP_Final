@@ -6,7 +6,7 @@ class entidad:
         
         self.posx = posx
         self.posy = posy
-        self.direccion = 'der' # 'right', 'left', 'up', 'down'
+        self.direccion = 'right' # 'right', 'left', 'up', 'down'
         self.direccion_deseada = 0
         self.velocidad = velocidad
     
@@ -23,9 +23,6 @@ class entidad:
         else:
             return False
         
-    def recepcion_input(self, tecla):
-        self.direccion_deseada = tecla
-    
     def cambio_direccion(self, mapa):
         '''
         Devuelve True cuando puede cambiar de direccion. False cuando no esta centrado en una casilla o no puede tomar la direccion que desea.
@@ -38,10 +35,10 @@ class entidad:
             
         
     def puede_moverse(self, mapa:dict, direccion_deseada = '') -> bool:
-        if self.direccion == '':
+        if direccion_deseada == '':
             angulo = self.direccion
         else: 
-            angulo == direccion_deseada
+            angulo = direccion_deseada
             
         x = self.posx / 25
         y = self.posy / 25
@@ -72,7 +69,7 @@ class entidad:
         elif self.direccion == 'left':
             pos2 = (-1 * self.velocidad, 0)
             
-        x, y = self.sumar_posiciones((self.posx, self.posy), pos2)
+        x, y = self.sumar_posiciones((self.posx, self.posy), tuple(pos2))
         
         self.posx = x
         self.posy = y
@@ -85,3 +82,5 @@ class pacman(entidad):
     def __init__(self, posx, posy, velocidad):
         super().__init__(posx, posy, velocidad)
         
+    def recepcion_input(self, tecla):
+        self.direccion_deseada = tecla
