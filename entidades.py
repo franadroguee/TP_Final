@@ -1,5 +1,9 @@
 class entidad:
     def __init__(self, posx, posy, velocidad):
+        '''
+        Define su posicion, direccion y velocidad
+        '''
+        
         self.posx = posx
         self.posy = posy
         self.direccion = 'der' # 'right', 'left', 'up', 'down'
@@ -9,23 +13,46 @@ class entidad:
     def cambiar_velocidad(self, nueva_velocidad: int):
         self.velocidad = nueva_velocidad
         
-    def posicion_perfecta(self):
+    def posicion_perfecta(self) -> bool:
+        '''
+        Devuelve True si la entidad esta ubicada en el centro de una casilla.
+        '''
+        
         if self.posx % 25 == 0 and self.posy % 25 == 0:
             return True
         else:
             return False
         
-    def puede_moverse(self, mapa:dict) -> bool:
+    def recepcion_input(self, tecla):
+        self.direccion_deseada = tecla
+    
+    def cambio_direccion(self, mapa):
+        '''
+        Devuelve True cuando puede cambiar de direccion. False cuando no esta centrado en una casilla o no puede tomar la direccion que desea.
+        '''
+        
+        if self.posicion_perfecta():
+            return self.puede_moverse(mapa, self.direccion_deseada)
+        else:
+            return False
+            
+        
+    def puede_moverse(self, mapa:dict, direccion_deseada = '') -> bool:
+        if self.direccion == '':
+            angulo = self.direccion
+        else: 
+            angulo == direccion_deseada
+            
         x = self.posx / 25
         y = self.posy / 25
         
-        if self.direccion == 'der' and x != 27:
+        if angulo == 'der' and x != 27:
             pos_siguiente = (x+1, y)
-        elif self.direccion == 'izq' and x != 0:
+        elif angulo == 'izq' and x != 0:
             pos_siguiente = (x-1, y)
-        elif self.direccion == 'up' and y != 0:
+        elif angulo == 'up' and y != 0:
             pos_siguiente = (x, y-1)
-        elif self.direccion == 'down' and y != 30:
+        elif angulo == 'down' and y != 30:
             pos_siguiente = (x, y+1)
         else:
             return False
@@ -53,3 +80,8 @@ class entidad:
 
     def sumar_posiciones(pos1: tuple, pos2: tuple) -> tuple:
         return tuple(a + b for a, b in zip(pos1, pos2))
+    
+class pacman(entidad):
+    def __init__(self, posx, posy, velocidad):
+        super().__init__(posx, posy, velocidad)
+        
