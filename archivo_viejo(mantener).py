@@ -22,7 +22,8 @@ class entidad:
             return False
         
     def movimiento(self, cantidad, angulo):
-        if self.direccion
+        if self.direccion:
+            pass
         
     def cambio_direccion(self, angulo: int):
         self.angulo_futuro = angulo
