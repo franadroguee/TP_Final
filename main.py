@@ -17,7 +17,7 @@ pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
 playing = True
 clock = pygame.time.Clock()
-jugador = pacman(20, 20, 10)
+jugador = pacman(20, 20, 5)
 
 dic_mapa = mapa(pantalla, 'mapa.txt', graficos)  
 
@@ -41,6 +41,6 @@ while playing:
                 jugador.recepcion_input('right')
             elif event.key == pygame.K_LEFT:
                 jugador.recepcion_input('left')
-    clock.tick(1)
+    clock.tick(20)
            
     

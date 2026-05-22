@@ -10,7 +10,7 @@ class entidad:
         self.posx = posx
         self.posy = posy
         self.direccion = 'right' # 'right', 'left', 'up', 'down'
-        self.direccion_deseada = 0
+        self.direccion_deseada = 'right'
         self.velocidad = velocidad
     
     def movimeinto(self):
@@ -46,6 +46,29 @@ class entidad:
         else:
             return False
         
+    def puede_cambiar_direccion(self, mapa) -> bool:
+        if self.posicion_perfecta():
+            x = int(self.posx / 20)
+            y = int(self.posy / 20)
+            
+            if self.direccion_deseada == 'right':
+                siguiente_casilla = (x+1, y)
+            elif self.direccion_deseada == 'left':
+                siguiente_casilla = (x-1, y)
+            elif self.direccion_deseada == 'up':
+                siguiente_casilla = (x, y-1)
+            elif self.direccion_deseada == 'down':
+                siguiente_casilla = (x, y+1)
+                
+            if mapa[siguiente_casilla] == 'pared':
+                return False
+            else:
+                return True
+        
+        else:
+            return True
+
+    
     def debe_moverse(self, mapa:dict) -> bool:
         if self.posicion_perfecta():
             x = int(self.posx / 20)
@@ -62,13 +85,15 @@ class entidad:
                 
             if mapa[siguiente_casilla] == 'pared':
                 return False
+            else:
+                return True
         
         else:
             return True
         
     def frame(self, mapa):
-        if self.direccion_deseada != self.direccion and self.posicion_perfecta:
-            self.cambio_direccion
+        if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
+            self.cambio_direccion()
             
         if self.debe_moverse(mapa):
             self.movimeinto()
