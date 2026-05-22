@@ -91,12 +91,26 @@ class personaje:
         else:
             return True
         
+    def analisis_comer(self, mapa: dict):
+        x = int(self.posx / 20)
+        y = int(self.posy / 20)
+        
+        if mapa[(x, y)] == 'punto' or mapa[(x, y)] == 'power':
+            mapa[(x, y)] = 'pasillo'
+            
+        return mapa
+            
     def frame(self, mapa):
         if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
             self.cambio_direccion()
             
         if self.debe_moverse(mapa):
             self.movimeinto()
+            
+        if self.posicion_perfecta():
+            mapa = self.analisis_comer(mapa)
+            
+        return mapa
             
             
 
@@ -106,3 +120,8 @@ class pacman(personaje):
         
     def recepcion_input(self, tecla):
         self.direccion_deseada = tecla
+
+class fantasma(personaje):
+    def __init__(self, posx, posy, velocidad, nombre):
+        super().__init__(posx, posy, velocidad)
+        self.nombre = nombre

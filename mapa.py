@@ -31,7 +31,7 @@ def mapa(pantalla, ruta_archivo: str, graficos: dict) -> dict:
                     dic_mapa[(x, y)] = 'ghost'
                 elif letra == 'o': # PowerPellet
                     pantalla.blit(graficos['power'], ((x * 20), (y * 20)))
-                    dic_mapa[(x, y)] = 'powerpellet'
+                    dic_mapa[(x, y)] = 'power'
                 elif letra == '-': # puerta ghost house
                     pantalla.blit(graficos['puerta'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'puerta'
@@ -75,7 +75,7 @@ def renderizado(pantalla, dic_mapa: dict, graficos: dict) -> None:
             pantalla.blit(graficos['pasillo'], (numero))
         elif celda == 'ghost': # Ghost house
             pantalla.blit(graficos['pasillo'], (numero))
-        elif celda == 'powerpellet': # PowerPellet
+        elif celda == 'power': # PowerPellet
             pantalla.blit(graficos['power'], (numero))
         elif celda == 'puerta': # puerta ghost house
             pantalla.blit(graficos['puerta'], (numero))
