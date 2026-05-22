@@ -1,6 +1,6 @@
 import pygame
 from mapa import mapa, renderizado
-from entidades import pacman
+from entidades_v2 import pacman
 
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
@@ -17,7 +17,7 @@ pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
 playing = True
 clock = pygame.time.Clock()
-jugador = pacman(20, 40, 0.1)
+jugador = pacman(20, 20, 10)
 
 dic_mapa = mapa(pantalla, 'mapa.txt', graficos)  
 
@@ -25,9 +25,8 @@ dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
 while playing:
     pantalla.fill((0, 0, 0))
     renderizado(pantalla, dic_mapa, graficos)
-    jugador.movimeinto()
-    jugador.cambio_direccion(dic_mapa)
-    pygame.draw.circle(pantalla, (255, 255, 255), ((jugador.posx -10), (jugador.posy -10)), 10)
+    jugador.frame(dic_mapa)
+    pygame.draw.circle(pantalla, (255, 255, 255), ((jugador.posx +10), (jugador.posy +10)), 10)
     pygame.display.update()
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
@@ -42,5 +41,6 @@ while playing:
                 jugador.recepcion_input('right')
             elif event.key == pygame.K_LEFT:
                 jugador.recepcion_input('left')
+    clock.tick(1)
            
     

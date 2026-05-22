@@ -29,7 +29,8 @@ class entidad:
         '''
         
         if self.posicion_perfecta():
-            return self.puede_moverse(mapa, self.direccion_deseada)
+            self.direccion = self.direccion_deseada
+            return True
         else:
             return False
             
