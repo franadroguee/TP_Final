@@ -1,6 +1,6 @@
 import pygame
 from mapa import mapa, renderizado
-from entidades_v2 import pacman
+from personajes import pacman
 
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
