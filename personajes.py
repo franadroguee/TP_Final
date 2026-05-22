@@ -60,7 +60,7 @@ class personaje:
             elif self.direccion_deseada == 'down':
                 siguiente_casilla = (x, y+1)
                 
-            if mapa[siguiente_casilla] == 'pared':
+            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
                 return False
             else:
                 return True
@@ -83,7 +83,7 @@ class personaje:
             elif self.direccion == 'down':
                 siguiente_casilla = (x, y+1)
                 
-            if mapa[siguiente_casilla] == 'pared':
+            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
                 return False
             else:
                 return True
