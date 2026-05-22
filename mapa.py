@@ -84,6 +84,6 @@ def renderizado(pantalla, dic_mapa: dict, graficos: dict) -> None:
         elif celda == 'inicio':
             pantalla.blit(graficos['pasillo'], (numero))
             
-    pygame.display.update()
+
 
 
