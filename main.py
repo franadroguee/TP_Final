@@ -8,13 +8,13 @@ pantalla = pygame.display.set_mode((560, 775))
 playing = True
 clock = pygame.time.Clock()
 jugador = pacman(200, 200, 5)
+pygame.draw.circle(pantalla, (255, 255, 255), ((jugador.posx -10), (jugador.posy -10)), 10)
 
 dic_mapa = mapa(pantalla, 'mapa.txt')  
 
 # loop del juego
 while playing:
     renderizado(pantalla, dic_mapa)
-    grafico_jugador = pygame.draw.circle(pantalla, (255, 255, 255), ((jugador.posx -10), (jugador.posy -10)), 10)
     jugador.movimeinto()
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:

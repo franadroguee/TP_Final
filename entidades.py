@@ -69,14 +69,16 @@ class entidad:
         elif self.direccion == 'left':
             pos2 = (-1 * self.velocidad, 0)
             
-        x, y = self.sumar_posiciones((self.posx, self.posy), tuple(pos2))
+        x2, y2 = pos2
+        pos_final = sumar_posiciones((self.posx, self.posy), (x2, y2))
         
+        x, y = pos_final
         self.posx = x
         self.posy = y
 
 
-    def sumar_posiciones(pos1: tuple, pos2: tuple) -> tuple:
-        return tuple(a + b for a, b in zip(pos1, pos2))
+def sumar_posiciones(pos1: tuple, pos2: tuple) -> tuple:
+    return tuple(a + b for a, b in zip(pos1, pos2))
     
 class pacman(entidad):
     def __init__(self, posx, posy, velocidad):
