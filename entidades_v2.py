@@ -1,7 +1,7 @@
 def sumar_posiciones(pos1: tuple, pos2: tuple) -> tuple:
     return tuple(a + b for a, b in zip(pos1, pos2))
     
-class entidad:
+class personaje:
     def __init__(self, posx:int, posy: int, velocidad: float):
         '''
         Define su posicion, direccion y velocidad
@@ -100,7 +100,7 @@ class entidad:
             
             
 
-class pacman(entidad):
+class pacman(personaje):
     def __init__(self, posx, posy, velocidad):
         super().__init__(posx, posy, velocidad)
         
