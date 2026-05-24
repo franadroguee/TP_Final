@@ -14,29 +14,14 @@ class personaje:
         self.velocidad = velocidad
     
     def movimeinto(self):
-        celdax = int(self.posx//20) + 1 if (self.posx % 20) > 10 else int(self.posx // 20)
-        celday = int(self.posy//20) + 1 if (self.posy % 20) > 10 else int(self.posy // 20)
-        
         if self.direccion == 'up':
-            if self.posy > (celday * 20) and (celday *20) < self.posy + self.velocidad:
-                pos2 = (0, -(self.posy - (celday *20)))
-            else:
-                pos2 = (0, -self.velocidad)           
+            pos2 = (0, -1 * self.velocidad)
         elif self.direccion == 'right':
-            if self.posx < (celdax * 20) and (celdax *20) < self.posx + self.velocidad:
-                pos2 = ((celdax*20)-self.posx, 0)
-            else:
-                pos2 = (self.velocidad, 0)           
+            pos2 = (self.velocidad, 0)
         elif self.direccion == 'down':
-            if self.posy < (celday * 20) and (celday *20) < self.posy + self.velocidad:
-                pos2 = (0, (celday*20)-self.posy)
-            else:
-                pos2 = (0, self.velocidad)           
+            pos2 = (0, self.velocidad)
         elif self.direccion == 'left':
-            if self.posx > (celdax * 20) and (celdax *20) < self.posx + self.velocidad:
-                pos2 = (-(self.posx - (celdax *20)), 0)
-            else:
-                pos2 = (-self.velocidad, 0)           
+            pos2 = (-1 * self.velocidad, 0)
             
         x2, y2 = pos2
         pos_final = sumar_posiciones((self.posx, self.posy), (x2, y2))

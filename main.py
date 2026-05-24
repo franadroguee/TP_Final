@@ -25,7 +25,10 @@ for numero, casilla in dic_mapa.items():
     if casilla == 'inicio':
         x_inicial, y_inicial = numero
         break
-jugador = pacman(x_inicial * 20, y_inicial * 20, 5)
+    
+velocidad = 7.5
+v_final = velocidad * 20 / 60
+jugador = pacman(x_inicial * 20, y_inicial * 20, v_final)
 
 def rotar_imagen(jugador):
     if jugador.direccion == 'right':
@@ -44,7 +47,7 @@ def rotar_imagen(jugador):
     return superficie_jugador_r, superficie_jugador_cerrado_r
 recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 frame = 0
-salto = 5 # cada {salto} frames, abre/ cierra la boca
+salto = 10 # cada {salto} frames, abre/ cierra la boca
 
 # loop del juego
 while playing:
@@ -59,7 +62,7 @@ while playing:
     elif frame < salto * 2:
         pantalla.blit(cerrado, (jugador.posx, jugador.posy))
     elif frame == salto * 2:
-        pantalla.blit(recargar_grafico, (jugador.posx -40, jugador.posy-40))
+        pantalla.blit(cerrado, (jugador.posx, jugador.posy))        
         frame = 0
         
     pygame.display.update()
@@ -77,6 +80,6 @@ while playing:
                 jugador.recepcion_input('right')
             elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 jugador.recepcion_input('left')
-    clock.tick(10)
+    clock.tick(60)
     frame += 1
     
