@@ -26,7 +26,7 @@ for numero, casilla in dic_mapa.items():
         x_inicial, y_inicial = numero
         break
     
-velocidad = 7.5 # casillas / segundo
+velocidad = 7.532749234 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, v_final)
 
@@ -62,7 +62,7 @@ while playing:
     elif frame < salto * 2:
         pantalla.blit(cerrado, (jugador.posx, jugador.posy))
     elif frame == salto * 2:
-        pantalla.blit(cerrado, (jugador.posx, jugador.posy))        
+        pantalla.blit(recargar_grafico, (jugador.posx, jugador.posy))        
         frame = 0
         
     pygame.display.update()
