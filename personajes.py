@@ -18,7 +18,7 @@ class personaje:
         celday = int(self.posy//20) + 1 if (self.posy % 20) > 10 else int(self.posy // 20)
         
         if self.direccion == 'up':
-            if self.posy > (celday * 20) and (celday *20) < self.posy + self.velocidad:
+            if self.posy < (celday * 20) and (celday *20) < self.posy + self.velocidad:
                 pos2 = (0, -(self.posy - (celday *20)))
             else:
                 pos2 = (0, -self.velocidad)           
@@ -33,7 +33,7 @@ class personaje:
             else:
                 pos2 = (0, self.velocidad)           
         elif self.direccion == 'left':
-            if self.posx > (celdax * 20) and (celdax *20) < self.posx + self.velocidad:
+            if self.posx < (celdax * 20) and (celdax *20) < self.posx + self.velocidad:
                 pos2 = (-(self.posx - (celdax *20)), 0)
             else:
                 pos2 = (-self.velocidad, 0)           
