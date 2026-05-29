@@ -49,12 +49,14 @@ recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 frame = 0
 salto = 12 # cada {salto} frames, abre/ cierra la boca
 
+puntaje = 0
+
 # loop del juego
 while playing:
     pantalla.fill((0, 0, 0))
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
-    dic_mapa = jugador.frame(snapshot)
+    dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
 
     abnierto, cerrado = rotar_imagen(jugador)
     if frame < salto:

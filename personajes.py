@@ -106,16 +106,19 @@ class personaje:
         else:
             return True
         
-    def analisis_comer(self, mapa: dict):
+    def analisis_comer(self, mapa: dict, puntaje):
         x = int(self.posx / 20)
         y = int(self.posy / 20)
         
-        if mapa[(x, y)] == 'punto' or mapa[(x, y)] == 'power':
+        if mapa[(x, y)] == 'punto':
             mapa[(x, y)] = 'pasillo'
+            puntaje += 10
+        elif  mapa[(x, y)] == 'power':
+            mapa[(x, y)] = 'pasillo'
+            puntaje += 20
+        return mapa, puntaje
             
-        return mapa
-            
-    def frame(self, mapa):
+    def frame(self, mapa, puntaje):
         if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
             self.cambio_direccion()
             
@@ -123,9 +126,9 @@ class personaje:
             self.movimeinto()
             
         if self.posicion_perfecta():
-            mapa = self.analisis_comer(mapa)
+            mapa, puntaje = self.analisis_comer(mapa, puntaje)
             
-        return mapa
+        return mapa, puntaje
             
             
 
