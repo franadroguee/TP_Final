@@ -7,6 +7,11 @@ from copy import deepcopy
 Este es el segundo intento. Este texto deberia aparecer en la rama FRAN y no en la rama MAIN
 """
 
+"""
+Este es el tercer comentario en la rama FRAN
+"""
+
+
 
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
