@@ -3,6 +3,11 @@ from mapa import mapa, renderizado
 from personajes import pacman
 from copy import deepcopy
 
+"""
+Este es el segundo intento. Este texto deberia aparecer en la rama FRAN y no en la rama MAIN
+"""
+
+
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
     'pasillo': pygame.image.load('graficos\pasillo.png'),
