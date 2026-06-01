@@ -3,16 +3,6 @@ from mapa import mapa, renderizado
 from personajes import pacman
 from copy import deepcopy
 
-"""
-Este es el segundo intento. Este texto deberia aparecer en la rama FRAN y no en la rama MAIN
-"""
-
-"""
-Este es el tercer comentario en la rama FRAN
-"""
-
-
-
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
     'pasillo': pygame.image.load('graficos\pasillo.png'),
@@ -24,6 +14,10 @@ graficos = {
 
 superficie_jugador = pygame.image.load('graficos\Pac_Man.png')
 superficie_jugador_cerrado = pygame.image.load('graficos\Pac_Man_Cerrado.png')
+
+game_font = pygame.font.Font("Arial", 50)
+white = (255, 255, 255)
+
 
 # inicializacion de pygame
 pygame.init()
@@ -63,10 +57,14 @@ puntaje = 0
 
 # loop del juego
 while playing:
+    text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
+
+    # 4. Blit (draw) the text surface to the screen at coordinates (X, Y)
     pantalla.fill((0, 0, 0))
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
     dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
+    pantalla.blit(text_surface, (100, 760))
 
     abnierto, cerrado = rotar_imagen(jugador)
     if frame < salto:
