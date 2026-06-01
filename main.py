@@ -12,6 +12,9 @@ Este es el tercer comentario en la rama FRAN
 """
 
 
+Este es el main en la rama FRAN. Si funciuona, este mensaje no se deberia ver en la rama MAIN pero si en la rama FRAN.
+"""
+
 
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
