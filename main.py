@@ -3,6 +3,11 @@ from mapa import mapa, renderizado
 from personajes import pacman
 from copy import deepcopy
 
+"""
+Este es el main en la rama FRAN. Si funciuona, este mensaje no se deberia ver en la rama MAIN pero si en la rama FRAN.
+"""
+
+
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
     'pasillo': pygame.image.load('graficos\pasillo.png'),
