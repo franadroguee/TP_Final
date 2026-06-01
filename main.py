@@ -3,6 +3,9 @@ from mapa import mapa, renderizado
 from personajes import pacman
 from copy import deepcopy
 
+pygame.init()
+pantalla = pygame.display.set_mode((560, 775))
+
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
     'pasillo': pygame.image.load('graficos\pasillo.png'),
@@ -15,13 +18,10 @@ graficos = {
 superficie_jugador = pygame.image.load('graficos\Pac_Man.png')
 superficie_jugador_cerrado = pygame.image.load('graficos\Pac_Man_Cerrado.png')
 
-game_font = pygame.font.Font("Arial", 50)
+game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
 
-
 # inicializacion de pygame
-pygame.init()
-pantalla = pygame.display.set_mode((560, 775))
 playing = True
 clock = pygame.time.Clock()
 dic_mapa = mapa(pantalla, 'mapa.txt', graficos)  
@@ -64,7 +64,7 @@ while playing:
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
     dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
-    pantalla.blit(text_surface, (100, 760))
+    pantalla.blit(text_surface, (100, 620))
 
     abnierto, cerrado = rotar_imagen(jugador)
     if frame < salto:
