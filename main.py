@@ -4,6 +4,14 @@ from personajes import pacman
 from copy import deepcopy
 
 """
+Este es el segundo intento. Este texto deberia aparecer en la rama FRAN y no en la rama MAIN
+"""
+
+"""
+Este es el tercer comentario en la rama FRAN
+"""
+
+
 Este es el main en la rama FRAN. Si funciuona, este mensaje no se deberia ver en la rama MAIN pero si en la rama FRAN.
 """
 
