@@ -7,16 +7,16 @@ pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
 
 graficos = {
-    'pared': pygame.image.load('graficos\pared.png'),
-    'pasillo': pygame.image.load('graficos\pasillo.png'),
-    'power': pygame.image.load('graficos\powerpellet.png'),
-    'puerta': pygame.image.load('graficos\puerta.png'),
-    'punto': pygame.image.load('graficos\punto.png'),
-    'tunel': pygame.image.load('graficos\gtunel.png')
+    'pared': pygame.image.load('graficos\Pac_Man.png'),
+    'pasillo': pygame.image.load('graficos\seisiete.png'),
+    'power': pygame.image.load('graficos\Background.png'),
+    'puerta': pygame.image.load('graficos\Background.png'),
+    'punto': pygame.image.load('graficos\Background.png'),
+    'tunel': pygame.image.load('graficos\Pac_Man.png')
     }
 
-superficie_jugador = pygame.image.load('graficos\Pac_Man.png')
-superficie_jugador_cerrado = pygame.image.load('graficos\Pac_Man_Cerrado.png')
+superficie_jugador = pygame.image.load('graficos\chinni.png')
+superficie_jugador_cerrado = pygame.image.load('graficos\chinni.png')
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -30,7 +30,7 @@ for numero, casilla in dic_mapa.items():
         x_inicial, y_inicial = numero
         break
     
-velocidad = 10 # casillas / segundo
+velocidad = 60 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
 
