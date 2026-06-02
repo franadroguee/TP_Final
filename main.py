@@ -16,7 +16,7 @@ graficos = {
     }
 
 superficie_jugador = pygame.image.load('graficos\chinni.png')
-superficie_jugador_cerrado = pygame.image.load('graficos\chinni.png')
+superficie_jugador_cerrado = pygame.image.load('graficos\GAME_OVER.png')
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -52,7 +52,7 @@ def rotar_imagen(jugador):
 recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 frame = 0
 contador = 0
-salto = 12 # cada {salto} frames, abre/ cierra la boca
+salto = 30 # cada {salto} frames, abre/ cierra la boca
 
 puntaje = 0
 
@@ -90,11 +90,11 @@ while playing:
 
     abnierto, cerrado = rotar_imagen(jugador)
     if frame < salto:
-        pantalla.blit(abnierto, (jugador.posx, jugador.posy))
+        pantalla.blit(abnierto, (jugador.posx - 40, jugador.posy- 40))
     elif frame < salto * 2:
-        pantalla.blit(cerrado, (jugador.posx, jugador.posy))
+        pantalla.blit(cerrado, (jugador.posx- 40, jugador.posy- 40))
     elif frame == salto * 2:
-        pantalla.blit(cerrado, (jugador.posx, jugador.posy))        
+        pantalla.blit(cerrado, (jugador.posx- 40, jugador.posy- 40))        
         frame = 0
         
     pygame.display.update()
