@@ -30,7 +30,7 @@ for numero, casilla in dic_mapa.items():
         x_inicial, y_inicial = numero
         break
     
-velocidad = 7.5 # casillas / segundo
+velocidad = 10 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
 
@@ -51,6 +51,7 @@ def rotar_imagen(jugador):
     return superficie_jugador_r, superficie_jugador_cerrado_r
 recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 frame = 0
+contador = 0
 salto = 12 # cada {salto} frames, abre/ cierra la boca
 
 puntaje = 0
@@ -59,11 +60,25 @@ puntaje = 0
 while playing:
     text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
 
-    # 4. Blit (draw) the text surface to the screen at coordinates (X, Y)
+        
     pantalla.fill((0, 0, 0))
+    if contador == 180:
+        hay_puntos = False
+        for item in dic_mapa.values():
+            if item == 'punto' or item == 'power':
+                hay_puntos = True
+                break
+        if hay_puntos:
+            pass
+        else:
+            dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
+        contador = 0
+        
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
     dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
+    
+    
     pantalla.blit(text_surface, (100, 620))
 
     abnierto, cerrado = rotar_imagen(jugador)
@@ -92,4 +107,5 @@ while playing:
                 jugador.recepcion_input('left')
     clock.tick(60)
     frame += 1
+    contador += 1
     
