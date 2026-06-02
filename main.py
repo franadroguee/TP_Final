@@ -72,6 +72,13 @@ while playing:
             pass
         else:
             dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
+            for numero, casilla in dic_mapa.items():
+                if casilla == 'inicio':
+                    x_inicial, y_inicial = numero
+                    jugador.posx = x_inicial * 20
+                    jugador.posy = y_inicial * 20
+                    break
+
         contador = 0
         
     renderizado(pantalla, dic_mapa, graficos)
