@@ -3,18 +3,8 @@ from mapa import mapa, renderizado
 from personajes import pacman
 from copy import deepcopy
 
-"""
-Este es el segundo intento. Este texto deberia aparecer en la rama FRAN y no en la rama MAIN
-"""
-
-"""
-Este es el tercer comentario en la rama FRAN
-"""
-
-
-Este es el main en la rama FRAN. Si funciuona, este mensaje no se deberia ver en la rama MAIN pero si en la rama FRAN.
-"""
-
+pygame.init()
+pantalla = pygame.display.set_mode((560, 775))
 
 graficos = {
     'pared': pygame.image.load('graficos\pared.png'),
@@ -28,9 +18,10 @@ graficos = {
 superficie_jugador = pygame.image.load('graficos\Pac_Man.png')
 superficie_jugador_cerrado = pygame.image.load('graficos\Pac_Man_Cerrado.png')
 
+game_font = pygame.font.Font(None, 50)
+white = (255, 255, 255)
+
 # inicializacion de pygame
-pygame.init()
-pantalla = pygame.display.set_mode((560, 775))
 playing = True
 clock = pygame.time.Clock()
 dic_mapa = mapa(pantalla, 'mapa.txt', graficos)  
@@ -39,7 +30,7 @@ for numero, casilla in dic_mapa.items():
         x_inicial, y_inicial = numero
         break
     
-velocidad = 7.5 # casillas / segundo
+velocidad = 10 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
 
@@ -60,16 +51,42 @@ def rotar_imagen(jugador):
     return superficie_jugador_r, superficie_jugador_cerrado_r
 recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 frame = 0
+contador = 0
 salto = 12 # cada {salto} frames, abre/ cierra la boca
 
 puntaje = 0
 
 # loop del juego
 while playing:
+    text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
+
+        
     pantalla.fill((0, 0, 0))
+    if contador == 180:
+        hay_puntos = False
+        for item in dic_mapa.values():
+            if item == 'punto' or item == 'power':
+                hay_puntos = True
+                break
+        if hay_puntos:
+            pass
+        else:
+            dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
+            for numero, casilla in dic_mapa.items():
+                if casilla == 'inicio':
+                    x_inicial, y_inicial = numero
+                    jugador.posx = x_inicial * 20
+                    jugador.posy = y_inicial * 20
+                    break
+
+        contador = 0
+        
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
     dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
+    
+    
+    pantalla.blit(text_surface, (100, 620))
 
     abnierto, cerrado = rotar_imagen(jugador)
     if frame < salto:
@@ -97,4 +114,5 @@ while playing:
                 jugador.recepcion_input('left')
     clock.tick(60)
     frame += 1
+    contador += 1
     

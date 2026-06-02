@@ -75,7 +75,7 @@ class personaje:
             elif self.direccion_deseada == 'down':
                 siguiente_casilla = (x, y+1)
                 
-            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
+            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta' or mapa[siguiente_casilla] == 'tunel':
                 return False
             else:
                 return True
@@ -83,6 +83,32 @@ class personaje:
         else:
             return True
 
+    def tunel(self, mapa: dict): 
+        x = int(self.posx / 20)
+        y = int(self.posy / 20)
+        
+        if mapa[(x, y)] == 'tunel':
+            tuneles = []
+            if self.direccion == 'right':
+                pos2 = (20, 0)
+            elif self .direccion == 'left':
+                pos2 = (-20, 0)
+            elif self .direccion == 'up':
+                pos2 = (0, -20)
+            elif self .direccion == 'down':
+                pos2 = (0, 20)
+
+            sumx, sumy = pos2
+            
+            for numero, casilla in mapa.items():
+                if casilla == 'tunel':
+                    tuneles.append(numero)
+            
+            for numero in tuneles:
+                tx, ty = numero
+                if (tx, ty) != (x, y):
+                    self.posx = (tx * 20) + sumx
+                    self.posy = (ty * 20) + sumy
     
     def debe_moverse(self, mapa:dict) -> bool:
         if self.posicion_perfecta():
@@ -127,6 +153,7 @@ class personaje:
             
         if self.posicion_perfecta():
             mapa, puntaje = self.analisis_comer(mapa, puntaje)
+            self.tunel(mapa)
             
         return mapa, puntaje
             
