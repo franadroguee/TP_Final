@@ -1,5 +1,17 @@
+from math import sqrt
+
 def sumar_posiciones(pos1: tuple, pos2: tuple) -> tuple:
     return tuple(a + b for a, b in zip(pos1, pos2))
+
+def distancia(pos1: tuple, pos2: tuple) -> float:
+    x1, y1 = pos1
+    x2, y2 = pos2
+    
+    dist_X = abs(x2 - x1)
+    dist_y = abs(y2 - y1)
+    
+    return sqrt(dist_X**2 + dist_y**2)
+
     
 class personaje:
     def __init__(self, posx:int, posy: int, velocidad: float):
@@ -142,9 +154,16 @@ class personaje:
         elif  mapa[(x, y)] == 'power':
             mapa[(x, y)] = 'pasillo'
             puntaje += 20
-        return mapa, puntaje
-            
-    def frame(self, mapa, puntaje):
+        return mapa, puntaje                 
+
+class pacman(personaje):
+    def __init__(self, posx, posy, velocidad):
+        super().__init__(posx, posy, velocidad)
+        
+    def recepcion_input(self, tecla):
+        self.direccion_deseada = tecla
+        
+    def frame_pacman(self, mapa, puntaje):
         if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
             self.cambio_direccion()
             
@@ -156,17 +175,45 @@ class personaje:
             self.tunel(mapa)
             
         return mapa, puntaje
-            
-            
 
-class pacman(personaje):
-    def __init__(self, posx, posy, velocidad):
-        super().__init__(posx, posy, velocidad)
-        
-    def recepcion_input(self, tecla):
-        self.direccion_deseada = tecla
 
 class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
+
+    def blinky(self, info_pacman: tuple, mapa: dict) -> str:
+        """
+        Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
+        """
+        
+        x = (self.posx)/20
+        y = (self.posy)/20
+        
+        pac_pos, pac_dir = info_pacman
+        pac_x, pac_y = pac_pos
+        
+        direcciones_disponibles = []
+        direcciones_posibles = {'left': (int(x-1), int(y)), 'right': (int(x+1), int(y)), 'up': (int(x), int(y-1)), 'down': (int(x), int(y+1))}
+        
+        for dir, casilla in direcciones_posibles.items():
+            if mapa[(casilla)] != 'pared':
+                direcciones_disponibles.append((dir, casilla))
+                
+        dist_min = float('inf')
+        for dir, casilla in direcciones_disponibles:
+            if distancia(casilla, (pac_x/20, pac_y/20)) < dist_min:
+                dir_min = dir
+                
+        return dir_min
+
+    def frame_ghost(self, mapa, info_pacman):
+        if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
+            self.cambio_direccion()
+            
+        if self.debe_moverse(mapa):
+            self.movimeinto()
+            
+        if self.posicion_perfecta():
+            self.direccion = self.blinky(info_pacman, mapa)
+        

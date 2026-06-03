@@ -1,6 +1,6 @@
 import pygame
 from mapa import mapa, renderizado
-from personajes import pacman
+from personajes import pacman, fantasma
 from copy import deepcopy
 
 pygame.init()
@@ -12,11 +12,13 @@ graficos = {
     'power': pygame.image.load('graficos\Background.png'),
     'puerta': pygame.image.load('graficos\Background.png'),
     'punto': pygame.image.load('graficos\Background.png'),
-    'tunel': pygame.image.load('graficos\Pac_Man.png')
+    'tunel': pygame.image.load('graficos\seisiete.png')
     }
 
-superficie_jugador = pygame.image.load('graficos\chinni.png')
+superficie_jugador = pygame.image.load('graficos\GAME_OVER.png')
 superficie_jugador_cerrado = pygame.image.load('graficos\GAME_OVER.png')
+
+superficie_fantasma = pygame.image.load('graficos\powerpellet.png')
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -55,12 +57,13 @@ frame = 0
 contador = 0
 salto = 30 # cada {salto} frames, abre/ cierra la boca
 
+blinky = fantasma(20, 20, v_final, 'blinky')
+
 puntaje = 0
 
 # loop del juego
 while playing:
-    tiempo_juego = pygame.tiem.g    
-
+    
     text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
         
     pantalla.fill((0, 0, 0))
@@ -85,13 +88,12 @@ while playing:
         
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
-    dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
+    dic_mapa, puntaje = jugador.frame_pacman(snapshot, puntaje)
     
     if jugador.posicion_perfecta():
         info_bots = ((jugador.posx, jugador.posy), jugador.direccion)
         
-    
-    
+    blinky.frame_ghost(dic_mapa, info_bots)
     
     pantalla.blit(text_surface, (100, 620))
 
@@ -103,6 +105,8 @@ while playing:
     elif frame == salto * 2:
         pantalla.blit(cerrado, (jugador.posx- 40, jugador.posy- 40))        
         frame = 0
+        
+    pantalla.blit(superficie_fantasma, (blinky.posx, blinky.posy))
         
     pygame.display.update()
     
