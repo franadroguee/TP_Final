@@ -194,16 +194,22 @@ class fantasma(personaje):
         pac_x, pac_y = pac_pos
         
         direcciones_disponibles = []
+        direccion_opuesta = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
         direcciones_posibles = {'left': (int(x-1), int(y)), 'right': (int(x+1), int(y)), 'up': (int(x), int(y-1)), 'down': (int(x), int(y+1))}
+        
+        direcciones_posibles.pop(direccion_opuesta[self.direccion])
         
         for dir, casilla in direcciones_posibles.items():
             if mapa[(casilla)] != 'pared':
                 direcciones_disponibles.append((dir, casilla))
                 
+        
         dist_min = float('inf')
         for dir, casilla in direcciones_disponibles:
-            if distancia(casilla, (pac_x/20, pac_y/20)) < dist_min:
+            dist = distancia(casilla, (pac_x, pac_y))
+            if dist < dist_min:
                 dir_min = dir
+                dist_min = dist
                 
         return dir_min
 

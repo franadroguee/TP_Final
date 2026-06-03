@@ -32,7 +32,7 @@ for numero, casilla in dic_mapa.items():
         x_inicial, y_inicial = numero
         break
     
-velocidad = 60 # casillas / segundo
+velocidad = 7.5 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
 info_bots = ((x_inicial, y_inicial), jugador.direccion)
@@ -91,7 +91,7 @@ while playing:
     dic_mapa, puntaje = jugador.frame_pacman(snapshot, puntaje)
     
     if jugador.posicion_perfecta():
-        info_bots = ((jugador.posx, jugador.posy), jugador.direccion)
+        info_bots = ((jugador.posx/20, jugador.posy/20), jugador.direccion)
         
     blinky.frame_ghost(dic_mapa, info_bots)
     
