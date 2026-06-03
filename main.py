@@ -33,6 +33,7 @@ for numero, casilla in dic_mapa.items():
 velocidad = 60 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
+info_bots = ((x_inicial, y_inicial), jugador.direccion)
 
 def rotar_imagen(jugador):
     if jugador.direccion == 'right':
@@ -58,8 +59,9 @@ puntaje = 0
 
 # loop del juego
 while playing:
-    text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
+    tiempo_juego = pygame.tiem.g    
 
+    text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
         
     pantalla.fill((0, 0, 0))
     if contador == 180:
@@ -84,6 +86,11 @@ while playing:
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
     dic_mapa, puntaje = jugador.frame(snapshot, puntaje)
+    
+    if jugador.posicion_perfecta():
+        info_bots = ((jugador.posx, jugador.posy), jugador.direccion)
+        
+    
     
     
     pantalla.blit(text_surface, (100, 620))
