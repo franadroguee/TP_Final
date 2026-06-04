@@ -1,4 +1,5 @@
 import pygame
+import os
 from mapa import mapa, renderizado
 from personajes import pacman, fantasma
 from copy import deepcopy
@@ -6,20 +7,21 @@ import random
 
 pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
+carpeta_graficos = 'graficos'
 
 graficos = {
-    'pared': pygame.image.load('graficos\Pac_Man.png'),
-    'pasillo': pygame.image.load('graficos\seisiete.png'),
-    'power': pygame.image.load('graficos\Background.png'),
-    'puerta': pygame.image.load('graficos\Background.png'),
-    'punto': pygame.image.load('graficos\Background.png'),
-    'tunel': pygame.image.load('graficos\seisiete.png')
+    'pared': pygame.image.load(os.path.join(carpeta_graficos, 'pared.png')),
+    'pasillo': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
+    'power': pygame.image.load(os.path.join(carpeta_graficos, 'powerpellet.png')),
+    'puerta': pygame.image.load(os.path.join(carpeta_graficos, 'puerta.png')),
+    'punto': pygame.image.load(os.path.join(carpeta_graficos, 'punto.png')),
+    'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'gtunel.png'))
     }
 
-superficie_jugador = pygame.image.load('graficos\chinni_abierto.png')
-superficie_jugador_cerrado = pygame.image.load('graficos\chinni_cerrado.png')
+superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
+superficie_jugador_cerrado = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man_Cerrado.png'))
 
-superficie_fantasma = pygame.image.load('graficos\chinni.png')
+superficie_fantasma = pygame.image.load(os.path.join(carpeta_graficos, 'Background.png'))
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -142,11 +144,11 @@ while playing:
 
     abnierto, cerrado = rotar_imagen(jugador)
     if frame < salto:
-        pantalla.blit(abnierto, (jugador.posx - 40, jugador.posy- 40))
+        pantalla.blit(abnierto, (jugador.posx, jugador.posy))
     elif frame < salto * 2:
-        pantalla.blit(cerrado, (jugador.posx- 40, jugador.posy- 40))
+        pantalla.blit(cerrado, (jugador.posx, jugador.posy))
     elif frame == salto * 2:
-        pantalla.blit(cerrado, (jugador.posx- 40, jugador.posy- 40))        
+        pantalla.blit(cerrado, (jugador.posx, jugador.posy))        
         frame = 0
         
     pygame.display.update()
