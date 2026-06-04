@@ -15,13 +15,16 @@ graficos = {
     'power': pygame.image.load(os.path.join(carpeta_graficos, 'powerpellet.png')),
     'puerta': pygame.image.load(os.path.join(carpeta_graficos, 'puerta.png')),
     'punto': pygame.image.load(os.path.join(carpeta_graficos, 'punto.png')),
-    'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png'))
+    'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
+    'blinky': pygame.image.load(os.path.join(carpeta_graficos, 'blinky.png')),
+    'pinky': pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png'))
     }
 
 superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
 superficie_jugador_cerrado = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man_Cerrado.png'))
 
-superficie_fantasma = pygame.image.load(os.path.join(carpeta_graficos, 'Background.png'))
+superficie_blinky = pygame.image.load(os.path.join(carpeta_graficos, 'blinky.png'))
+superficie_pinky = pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png'))
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -33,6 +36,7 @@ dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
 ghost_spawn = []
 ghost_places = []
 
+# lectura casilla de inicio y ghost house
 for numero, casilla in dic_mapa.items():
     if casilla == 'inicio':
         x_inicial, y_inicial = numero
@@ -42,35 +46,40 @@ for numero, casilla in dic_mapa.items():
     if casilla == 'puerta':
         ghost_places.append(numero)
     
-
+# jugador
 velocidad = 7.5 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
 pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
 info_bots = ((x_inicial, y_inicial), jugador.direccion)
 
+# creacion de los fantasmas
 bx, by = random.choice(ghost_spawn)
 blinky = fantasma(bx*20, by*20, v_final, 'blinky')
 blinky_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b = (bx, by)
+start_b = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
 blinky2 = fantasma(bx*20, by*20, v_final, 'blinky')
 blinky2_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b2 = (bx, by)
+start_b2 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-blinky3 = fantasma(bx*20, by*20, v_final, 'blinky')
-blinky3_rect = pygame.Rect(bx*20, by*20, 20, 20)
+pinky = fantasma(bx*20, by*20, v_final, 'pinky')
+pinky_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b3 = (bx, by)
+start_b3 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-blinky4 = fantasma(bx*20, by*20, v_final, 'blinky')
-blinky4_rect = pygame.Rect(bx*20, by*20, 20, 20)
+pinky2 = fantasma(bx*20, by*20, v_final, 'pinky')
+pinky2_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b4 = (bx, by)
+start_b4 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 def rotar_imagen(jugador):
@@ -90,20 +99,22 @@ def rotar_imagen(jugador):
     return superficie_jugador_r, superficie_jugador_cerrado_r
 
 recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
-frame = 0
-contador = 0
-salto = 30 # cada {salto} frames, abre/ cierra la boca
+salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 
 
 puntaje = 0
+vidas = 100
 
 # loop del juego
 while playing:
+    segundos = pygame.time.get_ticks()/1000
+    text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white)
     
-    text_surface = game_font.render(f"Puntaje: {puntaje} pts.", True, white)
-        
+    print(segundos)
+    
     pantalla.fill((0, 0, 0))
-    if contador == 180:
+    revision = round(segundos)
+    if revision % 3 == 0:
         hay_puntos = False
         for item in dic_mapa.values():
             if item == 'punto' or item == 'power':
@@ -129,42 +140,63 @@ while playing:
     if jugador.posicion_perfecta():
         info_bots = ((jugador.posx/20, jugador.posy/20), jugador.direccion)
         
-    render = blinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b)
+    render = blinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b)
     blinky_rect.topleft = (blinky.posx, blinky.posy)
     if render != None:
         pos_b = render
         
-    render = blinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b2)
+    render = blinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b2)
     blinky2_rect.topleft = (blinky2.posx, blinky2.posy)
     if render != None:
         pos_b2 = render
         
-    render = blinky3.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b3)
-    blinky3_rect.topleft = (blinky3.posx, blinky3.posy)
+    render = pinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b3)
+    pinky_rect.topleft = (pinky.posx, pinky.posy)
     if render != None:
         pos_b3 = render
         
-    render = blinky4.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b4)
-    blinky4_rect.topleft = (blinky4.posx, blinky4.posy)
+    render = pinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b4)
+    pinky2_rect.topleft = (pinky2.posx, pinky2.posy)
     if render != None:
         pos_b4 = render
 
     pantalla.blit(text_surface, (100, 620))
 
     abnierto, cerrado = rotar_imagen(jugador)
-    if frame < salto:
+    
+    fase = (segundos // salto) % 2
+    if fase == 0 :
         pantalla.blit(abnierto, (jugador.posx, jugador.posy))
-    elif frame < salto * 2:
+    else:
         pantalla.blit(cerrado, (jugador.posx, jugador.posy))
-    elif frame == salto * 2:
-        pantalla.blit(cerrado, (jugador.posx, jugador.posy))        
-        frame = 0
     
     pacman_rect.topleft = (jugador.posx, jugador.posy)
 
     pygame.display.update()
     
-    if pacman_rect.colliderect(blinky_rect) or pacman_rect.colliderect(blinky2_rect) or pacman_rect.colliderect(blinky3_rect) or pacman_rect.colliderect(blinky4_rect):
+    if pacman_rect.colliderect(blinky_rect) or pacman_rect.colliderect(blinky2_rect) or pacman_rect.colliderect(pinky_rect) or pacman_rect.colliderect(pinky2_rect):
+        vidas -= 1
+        for numero, casilla in dic_mapa.items():
+            if casilla == 'inicio':
+                x_inicial, y_inicial = numero
+                jugador.posx = x_inicial * 20
+                jugador.posy = y_inicial * 20
+                break
+            
+        blinky.posx, blinky.posy = start_b
+        blinky.salio_house = False
+        
+        blinky2.posx, blinky2.posy = start_b2
+        blinky2.salio_house = False
+        
+        pinky.posx, pinky.posy = start_b3
+        pinky.salio_house = False
+        
+        pinky2.posx, pinky2.posy = start_b4
+        pinky2.salio_house = False
+
+        
+    if vidas == 0:
         playing = False
     
     for event in pygame.event.get():    
@@ -180,7 +212,5 @@ while playing:
                 jugador.recepcion_input('right')
             elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 jugador.recepcion_input('left')
+                
     clock.tick(60)
-    frame += 1
-    contador += 1
-    

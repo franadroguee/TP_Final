@@ -183,12 +183,15 @@ class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
+        self.salio_house = False
 
     def ghost_render(self, ghost_places, mapa, info_bots, grafico, pantalla, pos_b):
         pos_b = None
         if self.posicion_perfecta():
             pos_b = (self.posx/20, self.posy/20)
             
+        if pos_b != None and pos_b not in ghost_places:
+            self.salio_house = True
         if pos_b in ghost_places:    
             self.frame_ghost(mapa, ((14, 0), None))
         else:
@@ -211,8 +214,11 @@ class fantasma(personaje):
                 siguiente_casilla = (x, y-1)
             elif self.direccion == 'down':
                 siguiente_casilla = (x, y+1)
-                
-            if mapa[siguiente_casilla] == 'pared':
+            
+            if not self.salio_house and mapa[siguiente_casilla] == 'puerta':
+                return True
+            
+            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
                 return False
             else:
                 return True
@@ -221,7 +227,7 @@ class fantasma(personaje):
             return True
 
 
-    def blinky(self, info_pacman: tuple, mapa: dict) -> str:
+    def blinky_chase(self, info_pacman: tuple, mapa: dict) -> str:
         """
         Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
         """
@@ -239,7 +245,11 @@ class fantasma(personaje):
         direcciones_posibles.pop(direccion_opuesta[self.direccion])
         
         for dir, casilla in direcciones_posibles.items():
-            if mapa[(casilla)] != 'pared':
+            
+            if not self.salio_house and mapa[casilla] == 'puerta':
+                direcciones_disponibles.append((dir, casilla))
+
+            if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
                 direcciones_disponibles.append((dir, casilla))
                 
         
@@ -251,11 +261,58 @@ class fantasma(personaje):
                 dist_min = dist
                 
         return dir_min
+    
+    def pinky_chase(self, info_pacman: tuple, mapa: dict) -> str:
+        """
+        Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
+        """
+        
+        x = (self.posx)/20
+        y = (self.posy)/20
+        tiles_direccion = {'right': (4, 0), 'left': (-4, 0), 'up': (0, -4), 'down': (0, 4)}
+        
+        pac_pos, pac_dir = info_pacman
+        pac_x, pac_y = pac_pos
+        if pac_dir == None:
+            suma = (0, 0)
+        else:
+            suma = tiles_direccion[pac_dir]
+        
+        obj = sumar_posiciones((pac_x, pac_y), (suma))
+        
+        direcciones_disponibles = []
+        direccion_opuesta = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
+        direcciones_posibles = {'left': (int(x-1), int(y)), 'right': (int(x+1), int(y)), 'up': (int(x), int(y-1)), 'down': (int(x), int(y+1))}
+        
+        direcciones_posibles.pop(direccion_opuesta[self.direccion])
+        
+        for dir, casilla in direcciones_posibles.items():
+            
+            if not self.salio_house and mapa[casilla] == 'puerta':
+                direcciones_disponibles.append((dir, casilla))
+
+            if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
+                direcciones_disponibles.append((dir, casilla))
+                
+        
+        dist_min = float('inf')
+        for dir, casilla in direcciones_disponibles:
+            dist = distancia(casilla, (obj))
+            if dist < dist_min:
+                dir_min = dir
+                dist_min = dist
+                
+        return dir_min
+
 
     def frame_ghost(self, mapa, info_pacman):
         if self.posicion_perfecta():
             self.tunel(mapa)
-            self.direccion = self.blinky(info_pacman, mapa)
+            
+            if self.nombre == 'blinky':
+                self.direccion = self.blinky_chase(info_pacman, mapa)
+            elif self.nombre == 'pinky':
+                self.direccion = self.pinky_chase(info_pacman, mapa)
                         
         if self.debe_moverse(mapa):
             self.movimeinto()
