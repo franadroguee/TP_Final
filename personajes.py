@@ -254,6 +254,7 @@ class fantasma(personaje):
 
     def frame_ghost(self, mapa, info_pacman):
         if self.posicion_perfecta():
+            self.tunel(mapa)
             self.direccion = self.blinky(info_pacman, mapa)
                         
         if self.debe_moverse(mapa):

@@ -15,7 +15,7 @@ graficos = {
     'power': pygame.image.load(os.path.join(carpeta_graficos, 'powerpellet.png')),
     'puerta': pygame.image.load(os.path.join(carpeta_graficos, 'puerta.png')),
     'punto': pygame.image.load(os.path.join(carpeta_graficos, 'punto.png')),
-    'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'gtunel.png'))
+    'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png'))
     }
 
 superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
