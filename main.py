@@ -2,6 +2,7 @@ import pygame
 from mapa import mapa, renderizado
 from personajes import pacman, fantasma
 from copy import deepcopy
+import random
 
 pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
@@ -18,7 +19,7 @@ graficos = {
 superficie_jugador = pygame.image.load('graficos\GAME_OVER.png')
 superficie_jugador_cerrado = pygame.image.load('graficos\GAME_OVER.png')
 
-superficie_fantasma = pygame.image.load('graficos\powerpellet.png')
+superficie_fantasma = pygame.image.load('graficos\chinni.png')
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -27,15 +28,43 @@ white = (255, 255, 255)
 playing = True
 clock = pygame.time.Clock()
 dic_mapa = mapa(pantalla, 'mapa.txt', graficos)  
+ghost_spawn = []
+ghost_places = []
+
 for numero, casilla in dic_mapa.items():
     if casilla == 'inicio':
         x_inicial, y_inicial = numero
-        break
+    elif casilla == 'ghost':
+        ghost_spawn.append(numero)
+        ghost_places.append(numero)
+    if casilla == 'puerta':
+        ghost_places.append(numero)
     
+
 velocidad = 7.5 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
 info_bots = ((x_inicial, y_inicial), jugador.direccion)
+
+bx, by = random.choice(ghost_spawn)
+blinky = fantasma(bx*20, by*20, v_final, 'blinky')
+pos_b = (bx, by)
+ghost_spawn.remove((bx, by))
+
+bx, by = random.choice(ghost_spawn)
+blinky2 = fantasma(bx*20, by*20, v_final, 'blinky')
+pos_b2 = (bx, by)
+ghost_spawn.remove((bx, by))
+
+bx, by = random.choice(ghost_spawn)
+blinky3 = fantasma(bx*20, by*20, v_final, 'blinky')
+pos_b3 = (bx, by)
+ghost_spawn.remove((bx, by))
+
+bx, by = random.choice(ghost_spawn)
+blinky4 = fantasma(bx*20, by*20, v_final, 'blinky')
+pos_b4 = (bx, by)
+ghost_spawn.remove((bx, by))
 
 def rotar_imagen(jugador):
     if jugador.direccion == 'right':
@@ -52,12 +81,12 @@ def rotar_imagen(jugador):
         superficie_jugador_cerrado_r = pygame.transform.rotate(superficie_jugador_cerrado, 270)
         
     return superficie_jugador_r, superficie_jugador_cerrado_r
+
 recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 frame = 0
 contador = 0
 salto = 30 # cada {salto} frames, abre/ cierra la boca
 
-blinky = fantasma(20, 20, v_final, 'blinky')
 
 puntaje = 0
 
@@ -93,8 +122,22 @@ while playing:
     if jugador.posicion_perfecta():
         info_bots = ((jugador.posx/20, jugador.posy/20), jugador.direccion)
         
-    blinky.frame_ghost(dic_mapa, info_bots)
-    
+    render = blinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b)
+    if render != None:
+        pos_b = render
+        
+    render = blinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b2)
+    if render != None:
+        pos_b2 = render
+        
+    render = blinky3.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b3)
+    if render != None:
+        pos_b3 = render
+        
+    render = blinky4.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b4)
+    if render != None:
+        pos_b4 = render
+
     pantalla.blit(text_surface, (100, 620))
 
     abnierto, cerrado = rotar_imagen(jugador)
@@ -105,8 +148,6 @@ while playing:
     elif frame == salto * 2:
         pantalla.blit(cerrado, (jugador.posx- 40, jugador.posy- 40))        
         frame = 0
-        
-    pantalla.blit(superficie_fantasma, (blinky.posx, blinky.posy))
         
     pygame.display.update()
     

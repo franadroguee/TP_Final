@@ -122,6 +122,24 @@ class personaje:
                     self.posx = (tx * 20) + sumx
                     self.posy = (ty * 20) + sumy
     
+        
+
+class pacman(personaje):
+    def __init__(self, posx, posy, velocidad):
+        super().__init__(posx, posy, velocidad)
+        
+    def analisis_comer(self, mapa: dict, puntaje):
+        x = int(self.posx / 20)
+        y = int(self.posy / 20)
+        
+        if mapa[(x, y)] == 'punto':
+            mapa[(x, y)] = 'pasillo'
+            puntaje += 10
+        elif  mapa[(x, y)] == 'power':
+            mapa[(x, y)] = 'pasillo'
+            puntaje += 20
+        return mapa, puntaje                 
+        
     def debe_moverse(self, mapa:dict) -> bool:
         if self.posicion_perfecta():
             x = int(self.posx / 20)
@@ -144,22 +162,6 @@ class personaje:
         else:
             return True
         
-    def analisis_comer(self, mapa: dict, puntaje):
-        x = int(self.posx / 20)
-        y = int(self.posy / 20)
-        
-        if mapa[(x, y)] == 'punto':
-            mapa[(x, y)] = 'pasillo'
-            puntaje += 10
-        elif  mapa[(x, y)] == 'power':
-            mapa[(x, y)] = 'pasillo'
-            puntaje += 20
-        return mapa, puntaje                 
-
-class pacman(personaje):
-    def __init__(self, posx, posy, velocidad):
-        super().__init__(posx, posy, velocidad)
-        
     def recepcion_input(self, tecla):
         self.direccion_deseada = tecla
         
@@ -181,6 +183,43 @@ class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
+
+    def ghost_render(self, ghost_places, mapa, info_bots, grafico, pantalla, pos_b):
+        pos_b = None
+        if self.posicion_perfecta():
+            pos_b = (self.posx/20, self.posy/20)
+            
+        if pos_b in ghost_places:    
+            self.frame_ghost(mapa, ((14, 0), None))
+        else:
+            self.frame_ghost(mapa, info_bots)
+            
+        pantalla.blit(grafico, (self.posx , self.posy))
+        
+        return pos_b
+
+    def debe_moverse(self, mapa:dict) -> bool:
+        if self.posicion_perfecta():
+            x = int(self.posx / 20)
+            y = int(self.posy / 20)
+            
+            if self.direccion == 'right':
+                siguiente_casilla = (x+1, y)
+            elif self.direccion == 'left':
+                siguiente_casilla = (x-1, y)
+            elif self.direccion == 'up':
+                siguiente_casilla = (x, y-1)
+            elif self.direccion == 'down':
+                siguiente_casilla = (x, y+1)
+                
+            if mapa[siguiente_casilla] == 'pared':
+                return False
+            else:
+                return True
+        
+        else:
+            return True
+
 
     def blinky(self, info_pacman: tuple, mapa: dict) -> str:
         """
@@ -214,12 +253,10 @@ class fantasma(personaje):
         return dir_min
 
     def frame_ghost(self, mapa, info_pacman):
-        if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
-            self.cambio_direccion()
-            
+        if self.posicion_perfecta():
+            self.direccion = self.blinky(info_pacman, mapa)
+                        
         if self.debe_moverse(mapa):
             self.movimeinto()
             
-        if self.posicion_perfecta():
-            self.direccion = self.blinky(info_pacman, mapa)
         
