@@ -16,8 +16,8 @@ graficos = {
     'tunel': pygame.image.load('graficos\seisiete.png')
     }
 
-superficie_jugador = pygame.image.load('graficos\GAME_OVER.png')
-superficie_jugador_cerrado = pygame.image.load('graficos\GAME_OVER.png')
+superficie_jugador = pygame.image.load('graficos\chinni_abierto.png')
+superficie_jugador_cerrado = pygame.image.load('graficos\chinni_cerrado.png')
 
 superficie_fantasma = pygame.image.load('graficos\chinni.png')
 
