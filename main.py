@@ -164,7 +164,7 @@ while playing:
 
     pygame.display.update()
     
-    if pacman_rect.collidedict(blinky_rect) or pacman_rect.collidedict(blinky2_rect) or pacman_rect.collidedict(blinky3_rect) or pacman_rect.collidedict(blinky4_rect):
+    if pacman_rect.colliderect(blinky_rect) or pacman_rect.colliderect(blinky2_rect) or pacman_rect.colliderect(blinky3_rect) or pacman_rect.colliderect(blinky4_rect):
         playing = False
     
     for event in pygame.event.get():    
