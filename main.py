@@ -46,25 +46,30 @@ for numero, casilla in dic_mapa.items():
 velocidad = 7.5 # casillas / segundo
 v_final = velocidad * 20 / 60
 jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
+pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
 info_bots = ((x_inicial, y_inicial), jugador.direccion)
 
 bx, by = random.choice(ghost_spawn)
 blinky = fantasma(bx*20, by*20, v_final, 'blinky')
+blinky_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b = (bx, by)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
 blinky2 = fantasma(bx*20, by*20, v_final, 'blinky')
+blinky2_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b2 = (bx, by)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
 blinky3 = fantasma(bx*20, by*20, v_final, 'blinky')
+blinky3_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b3 = (bx, by)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
 blinky4 = fantasma(bx*20, by*20, v_final, 'blinky')
+blinky4_rect = pygame.Rect(bx*20, by*20, 20, 20)
 pos_b4 = (bx, by)
 ghost_spawn.remove((bx, by))
 
@@ -125,18 +130,22 @@ while playing:
         info_bots = ((jugador.posx/20, jugador.posy/20), jugador.direccion)
         
     render = blinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b)
+    blinky_rect.topleft = (blinky.posx, blinky.posy)
     if render != None:
         pos_b = render
         
     render = blinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b2)
+    blinky2_rect.topleft = (blinky2.posx, blinky2.posy)
     if render != None:
         pos_b2 = render
         
     render = blinky3.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b3)
+    blinky3_rect.topleft = (blinky3.posx, blinky3.posy)
     if render != None:
         pos_b3 = render
         
     render = blinky4.ghost_render(ghost_places, dic_mapa, info_bots, superficie_fantasma, pantalla, pos_b4)
+    blinky4_rect.topleft = (blinky4.posx, blinky4.posy)
     if render != None:
         pos_b4 = render
 
@@ -150,8 +159,13 @@ while playing:
     elif frame == salto * 2:
         pantalla.blit(cerrado, (jugador.posx, jugador.posy))        
         frame = 0
-        
+    
+    pacman_rect.topleft = (jugador.posx, jugador.posy)
+
     pygame.display.update()
+    
+    if pacman_rect.collidedict(blinky_rect) or pacman_rect.collidedict(blinky2_rect) or pacman_rect.collidedict(blinky3_rect) or pacman_rect.collidedict(blinky4_rect):
+        playing = False
     
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
