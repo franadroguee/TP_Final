@@ -194,7 +194,7 @@ class fantasma(personaje):
         else:
             self.frame_ghost(mapa, info_bots)
             
-        pantalla.blit(grafico, (self.posx , self.posy))
+        pantalla.blit(grafico, (self.posx, self.posy))
         
         return pos_b
 
