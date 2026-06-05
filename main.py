@@ -137,22 +137,22 @@ while playing:
     if jugador.posicion_perfecta():
         info_bots = ((jugador.posx/20, jugador.posy/20), jugador.direccion)
         
-    render = blinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b)
+    render = blinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b)
     blinky_rect.topleft = (blinky.posx, blinky.posy)
     if render != None:
         pos_b = render
         
-    render = blinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b2)
+    render = blinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b2)
     blinky2_rect.topleft = (blinky2.posx, blinky2.posy)
     if render != None:
         pos_b2 = render
         
-    render = pinky.ghost_render(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b3)
+    render = pinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b3)
     pinky_rect.topleft = (pinky.posx, pinky.posy)
     if render != None:
         pos_b3 = render
         
-    render = pinky2.ghost_render(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b4)
+    render = pinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b4)
     pinky2_rect.topleft = (pinky2.posx, pinky2.posy)
     if render != None:
         pos_b4 = render

@@ -58,7 +58,7 @@ def renderizado(pantalla, dic_mapa: dict, graficos: dict) -> None:
     
     # graficos
     
-    for elemento in dic_mapa.items():
+    for elemento in dic_mapa.items(): # analiza todas las casillas del mapa
         
         numero, celda = elemento
         x, y = numero

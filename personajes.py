@@ -1,9 +1,17 @@
 from math import sqrt
 
 def sumar_posiciones(pos1: tuple, pos2: tuple) -> tuple:
+    """
+    Obtiene dos tuplas con coordenadas y las suma
+    """
+    
     return tuple(a + b for a, b in zip(pos1, pos2))
 
 def distancia(pos1: tuple, pos2: tuple) -> float:
+    """
+    Calcula la distancia diagonal entre dos casillas
+    """
+    
     x1, y1 = pos1
     x2, y2 = pos2
     
@@ -12,9 +20,8 @@ def distancia(pos1: tuple, pos2: tuple) -> float:
     
     return sqrt(dist_X**2 + dist_y**2)
 
-    
 class personaje:
-    def __init__(self, posx:int, posy: int, velocidad: float):
+    def __init__(self, posx:int, posy: int, velocidad: float) -> None:
         '''
         Define su posicion, direccion y velocidad
         '''
@@ -25,42 +32,51 @@ class personaje:
         self.direccion_deseada = 'right'
         self.velocidad = velocidad
     
-    def movimeinto(self):
-        celdax = int(self.posx//20) + 1 if (self.posx % 20) > 10 else int(self.posx // 20)
+    def movimeinto(self) -> None:
+        """
+        Altera self.posx, self.posy en funcion de la direccion del personaje. Si esta por salirse de una casilla, antes de hacerlo, se centra en la misma.
+        """
+        
+        # primero calcula la celda x e y del personaje a pesar de que no este centrado
+        celdax = int(self.posx//20) + 1 if (self.posx % 20) > 10 else int(self.posx // 20) 
         celday = int(self.posy//20) + 1 if (self.posy % 20) > 10 else int(self.posy // 20)
         
         if self.direccion == 'up':
-            if self.posy < (celday * 20) and (celday *20) < self.posy + self.velocidad:
+            if self.posy < (celday * 20) and (celday *20) < self.posy + self.velocidad: # en caso de que el personaje este a punto de salirse de la celda, sin haber estado centrado en ella, limita su velocidad durante 1 frame para que este contenido en la casilla
                 pos2 = (0, -(self.posy - (celday *20)))
             else:
-                pos2 = (0, -self.velocidad)           
+                pos2 = (0, -self.velocidad) # si no esta a punto de salirse de su casilla, se mueve a velocidad normal
+                
         elif self.direccion == 'right':
             if self.posx < (celdax * 20) and (celdax *20) < self.posx + self.velocidad:
                 pos2 = ((celdax*20)-self.posx, 0)
             else:
-                pos2 = (self.velocidad, 0)           
+                pos2 = (self.velocidad, 0)       
+                    
         elif self.direccion == 'down':
             if self.posy < (celday * 20) and (celday *20) < self.posy + self.velocidad:
                 pos2 = (0, (celday*20)-self.posy)
             else:
-                pos2 = (0, self.velocidad)           
+                pos2 = (0, self.velocidad)   
+                        
         elif self.direccion == 'left':
             if self.posx < (celdax * 20) and (celdax *20) < self.posx + self.velocidad:
                 pos2 = (-(self.posx - (celdax *20)), 0)
             else:
                 pos2 = (-self.velocidad, 0)           
             
-        x2, y2 = pos2
+        x2, y2 = pos2 
         pos_final = sumar_posiciones((self.posx, self.posy), (x2, y2))
         
         x, y = pos_final
         self.posx = x
         self.posy = y
     
-    def cambio_direccion(self):
-        self.direccion = self.direccion_deseada
-    
-    def cambiar_velocidad(self, nueva_velocidad: int):
+    def cambiar_velocidad(self, nueva_velocidad: int) -> None:
+        """
+        Altera la velocidad del personaje
+        """
+        
         self.velocidad = nueva_velocidad
         
     def posicion_perfecta(self) -> bool:
@@ -68,34 +84,17 @@ class personaje:
         Devuelve True si la entidad esta ubicada en el centro de una casilla.
         '''
         
-        if self.posx % 20 == 0 and self.posy % 20 == 0:
+        if self.posx % 20 == 0 and self.posy % 20 == 0: 
+            # en caso de que el resto de dividir la posicion del personaje por 20 sea 0, se sabe que esta centrado en una casilla
             return True
         else:
             return False
         
-    def puede_cambiar_direccion(self, mapa) -> bool:
-        if self.posicion_perfecta():
-            x = int(self.posx / 20)
-            y = int(self.posy / 20)
-            
-            if self.direccion_deseada == 'right':
-                siguiente_casilla = (x+1, y)
-            elif self.direccion_deseada == 'left':
-                siguiente_casilla = (x-1, y)
-            elif self.direccion_deseada == 'up':
-                siguiente_casilla = (x, y-1)
-            elif self.direccion_deseada == 'down':
-                siguiente_casilla = (x, y+1)
-                
-            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta' or mapa[siguiente_casilla] == 'tunel':
-                return False
-            else:
-                return True
+    def chequeo_tunel(self, mapa: dict) -> None: 
+        """
+        A ejecutarse con el personaje centrado. Revisa si su posicion es un tunel. De serlo, altera su posx, posy a la posicion del otro tunel en el mapa
+        """
         
-        else:
-            return True
-
-    def tunel(self, mapa: dict): 
         x = int(self.posx / 20)
         y = int(self.posy / 20)
         
@@ -121,52 +120,100 @@ class personaje:
                 if (tx, ty) != (x, y):
                     self.posx = (tx * 20) + sumx
                     self.posy = (ty * 20) + sumy
-    
-        
 
 class pacman(personaje):
-    def __init__(self, posx, posy, velocidad):
+    def __init__(self, posx, posy, velocidad) -> None:
         super().__init__(posx, posy, velocidad)
         
-    def analisis_comer(self, mapa: dict, puntaje):
-        x = int(self.posx / 20)
-        y = int(self.posy / 20)
+    def puede_cambiar_direccion(self, mapa: dict) -> bool:
+        """
+        Analiza los obstaculos en el mapa para establecer si el personaje puede o no cambiar de direccion
+        """
         
-        if mapa[(x, y)] == 'punto':
-            mapa[(x, y)] = 'pasillo'
-            puntaje += 10
-        elif  mapa[(x, y)] == 'power':
-            mapa[(x, y)] = 'pasillo'
-            puntaje += 20
-        return mapa, puntaje                 
-        
-    def debe_moverse(self, mapa:dict) -> bool:
         if self.posicion_perfecta():
-            x = int(self.posx / 20)
+            x = int(self.posx / 20) # al estar centrado, la division de su posicion por 20 tendra resto 0
             y = int(self.posy / 20)
             
-            if self.direccion == 'right':
+            if self.direccion_deseada == 'right':
                 siguiente_casilla = (x+1, y)
-            elif self.direccion == 'left':
+            elif self.direccion_deseada == 'left':
                 siguiente_casilla = (x-1, y)
-            elif self.direccion == 'up':
+            elif self.direccion_deseada == 'up':
                 siguiente_casilla = (x, y-1)
-            elif self.direccion == 'down':
+            elif self.direccion_deseada == 'down':
                 siguiente_casilla = (x, y+1)
                 
-            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
+            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta' or mapa[siguiente_casilla] == 'tunel':
                 return False
             else:
                 return True
         
         else:
+            return False
+
+        
+    def cambio_direccion(self) -> None:
+        """
+        Dirije al personaje en la direccion en la que deseaba ir 
+        """
+        
+        self.direccion = self.direccion_deseada
+
+    def analisis_comer(self, mapa: dict, puntaje) -> dict | int:
+        """
+        A ejecutarse cuando el personaje esta centrado en una casilla. Si la casilla tiene un comestible (punto, powerpellet), lo remueve del mapa y registra la accion
+        """
+        
+        x = int(self.posx / 20)
+        y = int(self.posy / 20)
+        
+        if mapa[(x, y)] == 'punto': 
+            mapa[(x, y)] = 'pasillo' # remueve el punto del mapa
+            puntaje += 10 # suma 10 puntos por el consumible "punto"
+        elif  mapa[(x, y)] == 'power':
+            mapa[(x, y)] = 'pasillo'
+            puntaje += 20 # suma 20 puntos por el consumible "PowerPellet"
+        return mapa, puntaje                 
+        
+    def debe_moverse(self, mapa:dict) -> bool:
+        """
+        A ejecutarse cuando el personaje esta centrado en una casilla. Si la casilla siguiente en la direccion que esta yendo es un obstaculo, retorna False. De no serlo, retorna True.
+        """
+        
+        if self.posicion_perfecta():
+            x = int(self.posx / 20) # dado que el personaje esta centrado, la division siempre devolvera un numero redondo
+            y = int(self.posy / 20)
+            
+            if self.direccion == 'right':
+                siguiente_casilla = (x+1, y) # 1 casilla a la derecha
+            elif self.direccion == 'left':
+                siguiente_casilla = (x-1, y) # 1 casilla a la izquierda
+            elif self.direccion == 'up':
+                siguiente_casilla = (x, y-1) # 1 casilla arriba
+            elif self.direccion == 'down':
+                siguiente_casilla = (x, y+1) # una casilla abajo
+                
+            if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta': # dado que el personaje esta centrado, se puede saber facilmente cual sera la siguiente casilla en la que estara en funcion de su direccion.
+                return False
+            else: 
+                return True # no hay obstaculos
+        
+        else:
             return True
         
-    def recepcion_input(self, tecla):
+    def recepcion_input(self, tecla) -> None:
+        """
+        Establece la direccion deseada del personaje a la tecla oprimida por el jugador
+        """
+        
         self.direccion_deseada = tecla
         
-    def frame_pacman(self, mapa, puntaje):
-        if self.direccion_deseada != self.direccion and self.posicion_perfecta() and self.puede_cambiar_direccion(mapa):
+    def frame_pacman(self, mapa: dict, puntaje: int) -> dict | int:
+        """
+        Se ejecuta todos los frames. Procesa todas las acciones del personaje (movimiento, comestibles, etc.). Devuelve el diccionario con el mapa actualizado y el nuevo puntaje del jugador
+        """
+        if self.direccion_deseada != self.direccion and self.puede_cambiar_direccion(mapa):
+            # si pacman desea ir en una direccion distinta a la que esta yendo y esta centrado
             self.cambio_direccion()
             
         if self.debe_moverse(mapa):
@@ -174,10 +221,9 @@ class pacman(personaje):
             
         if self.posicion_perfecta():
             mapa, puntaje = self.analisis_comer(mapa, puntaje)
-            self.tunel(mapa)
+            self.chequeo_tunel(mapa)
             
         return mapa, puntaje
-
 
 class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre):
@@ -185,7 +231,7 @@ class fantasma(personaje):
         self.nombre = nombre
         self.salio_house = False
 
-    def ghost_render(self, ghost_places, mapa, info_bots, grafico, pantalla, pos_b):
+    def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, pos_b: tuple) -> tuple | None:
         pos_b = None
         if self.posicion_perfecta():
             pos_b = (self.posx/20, self.posy/20)
@@ -193,15 +239,31 @@ class fantasma(personaje):
         if pos_b != None and pos_b not in ghost_places:
             self.salio_house = True
         if pos_b in ghost_places:    
-            self.frame_ghost(mapa, ((14, 0), None))
+            objetivo = ((14, 0), None)
         else:
-            self.frame_ghost(mapa, info_bots)
+            objetivo = info_bots
+            
+        if self.posicion_perfecta():
+            self.chequeo_tunel(mapa)
+            
+            if self.nombre == 'blinky':
+                self.direccion = self.blinky_chase(objetivo, mapa)
+            elif self.nombre == 'pinky':
+                self.direccion = self.pinky_chase(objetivo, mapa)
+                        
+        if self.debe_moverse(mapa):
+            self.movimeinto()
+
             
         pantalla.blit(grafico, (self.posx, self.posy))
         
         return pos_b
 
     def debe_moverse(self, mapa:dict) -> bool:
+        """
+        A ejecutarse con el personaje centrado. Analiza el mapa para ver si la proxima casilla es un obstaculo de serlo retorna False. De no serlo retorna True
+        """
+        
         if self.posicion_perfecta():
             x = int(self.posx / 20)
             y = int(self.posy / 20)
@@ -226,17 +288,13 @@ class fantasma(personaje):
         else:
             return True
 
+    def dirigirse_a_casilla(self, objetivo: tuple, mapa: dict) -> str:
+        """
+        Recibe un tile objetivo y calcula, teniendo en cuenta los obstaculos del mapa, que direccion es la mas optima para acercarse a su tile objetivo. No habilita el cambio de direccion
+        """
 
-    def blinky_chase(self, info_pacman: tuple, mapa: dict) -> str:
-        """
-        Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
-        """
-        
         x = (self.posx)/20
         y = (self.posy)/20
-        
-        pac_pos, pac_dir = info_pacman
-        pac_x, pac_y = pac_pos
         
         direcciones_disponibles = []
         direccion_opuesta = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
@@ -255,22 +313,36 @@ class fantasma(personaje):
         
         dist_min = float('inf')
         for dir, casilla in direcciones_disponibles:
-            dist = distancia(casilla, (pac_x, pac_y))
+            dist = distancia(casilla, (objetivo))
             if dist < dist_min:
                 dir_min = dir
                 dist_min = dist
                 
         return dir_min
+
+    
+    def scatter(self, esquina, mapa) -> str:
+        """
+        Recibe la esquina en la que el fantasma ejecuta "scatter" y dirije al fantasma hacia ella mediante la direccion contenida en un str.
+        """
+        
+        return self.dirigirse_a_casilla(esquina, mapa)
+
+    def blinky_chase(self, info_pacman: tuple, mapa: dict) -> str:
+        """
+        Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
+        """
+        
+        pac_pos, pac_dir = info_pacman
+                        
+        return self.dirigirse_a_casilla(pac_pos, mapa)
     
     def pinky_chase(self, info_pacman: tuple, mapa: dict) -> str:
         """
         Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
         """
-        
-        x = (self.posx)/20
-        y = (self.posy)/20
+            
         tiles_direccion = {'right': (4, 0), 'left': (-4, 0), 'up': (0, -4), 'down': (0, 4)}
-        
         pac_pos, pac_dir = info_pacman
         pac_x, pac_y = pac_pos
         if pac_dir == None:
@@ -280,41 +352,4 @@ class fantasma(personaje):
         
         obj = sumar_posiciones((pac_x, pac_y), (suma))
         
-        direcciones_disponibles = []
-        direccion_opuesta = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
-        direcciones_posibles = {'left': (int(x-1), int(y)), 'right': (int(x+1), int(y)), 'up': (int(x), int(y-1)), 'down': (int(x), int(y+1))}
-        
-        direcciones_posibles.pop(direccion_opuesta[self.direccion])
-        
-        for dir, casilla in direcciones_posibles.items():
-            
-            if not self.salio_house and mapa[casilla] == 'puerta':
-                direcciones_disponibles.append((dir, casilla))
-
-            if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
-                direcciones_disponibles.append((dir, casilla))
-                
-        
-        dist_min = float('inf')
-        for dir, casilla in direcciones_disponibles:
-            dist = distancia(casilla, (obj))
-            if dist < dist_min:
-                dir_min = dir
-                dist_min = dist
-                
-        return dir_min
-
-
-    def frame_ghost(self, mapa, info_pacman):
-        if self.posicion_perfecta():
-            self.tunel(mapa)
-            
-            if self.nombre == 'blinky':
-                self.direccion = self.blinky_chase(info_pacman, mapa)
-            elif self.nombre == 'pinky':
-                self.direccion = self.pinky_chase(info_pacman, mapa)
-                        
-        if self.debe_moverse(mapa):
-            self.movimeinto()
-            
-        
+        return self.dirigirse_a_casilla(obj, mapa)
