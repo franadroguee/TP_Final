@@ -212,3 +212,4 @@ while playing:
                 jugador.recepcion_input('left')
                 
     clock.tick(60)
+
