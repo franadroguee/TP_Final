@@ -109,9 +109,7 @@ vidas = 100
 while playing:
     segundos = pygame.time.get_ticks()/1000
     text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white)
-    
-    print(segundos)
-    
+        
     pantalla.fill((0, 0, 0))
     revision = round(segundos)
     if revision % 3 == 0:
