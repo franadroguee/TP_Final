@@ -98,7 +98,6 @@ def rotar_imagen(jugador):
         
     return superficie_jugador_r, superficie_jugador_cerrado_r
 
-recargar_grafico = pygame.image.load('graficos\GAME_OVER.png')
 salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 
 
