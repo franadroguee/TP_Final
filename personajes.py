@@ -31,6 +31,7 @@ class personaje:
         self.direccion = 'right' # 'right', 'left', 'up', 'down'
         self.direccion_deseada = 'right'
         self.velocidad = velocidad
+        self.casilla = (posx/20, posy/20) # se actualiza cuando el personaje esta centrado
     
     def movimeinto(self) -> None:
         """
@@ -220,6 +221,7 @@ class pacman(personaje):
             self.movimeinto()
             
         if self.posicion_perfecta():
+            self.casilla = (self.posx/20, self.posy/20)
             mapa, puntaje = self.analisis_comer(mapa, puntaje)
             self.chequeo_tunel(mapa)
             
@@ -231,17 +233,17 @@ class fantasma(personaje):
         self.nombre = nombre
         self.salio_house = False
 
-    def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, pos_b: tuple) -> tuple | None:
-        pos_b = None
+    def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla) -> None:
         if self.posicion_perfecta():
-            pos_b = (self.posx/20, self.posy/20)
+            self.casilla = (self.posx/20, self.posy/20)
             
-        if pos_b != None and pos_b not in ghost_places:
+        if self.casilla not in ghost_places:
             self.salio_house = True
-        if pos_b in ghost_places:    
-            objetivo = ((14, 0), None)
-        else:
+            
+        if self.salio_house:    
             objetivo = info_bots
+        else:
+            objetivo = ((14, 0), None)
             
         if self.posicion_perfecta():
             self.chequeo_tunel(mapa)
@@ -257,8 +259,6 @@ class fantasma(personaje):
             
         pantalla.blit(grafico, (self.posx, self.posy))
         
-        return pos_b
-
     def debe_moverse(self, mapa:dict) -> bool:
         """
         A ejecutarse con el personaje centrado. Analiza el mapa para ver si la proxima casilla es un obstaculo de serlo retorna False. De no serlo retorna True

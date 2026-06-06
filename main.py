@@ -39,7 +39,7 @@ ghost_places = []
 # lectura casilla de inicio y ghost house
 for numero, casilla in dic_mapa.items():
     if casilla == 'inicio':
-        x_inicial, y_inicial = numero
+        casilla_de_inicio = numero
     elif casilla == 'ghost':
         ghost_spawn.append(numero)
         ghost_places.append(numero)
@@ -49,9 +49,9 @@ for numero, casilla in dic_mapa.items():
 # jugador
 velocidad = 7.5 # casillas / segundo
 v_final = velocidad * 20 / 60
-jugador = pacman(x_inicial * 20, y_inicial * 20, round(v_final, 2))
+pac_x_inic, pac_y_inic = casilla_de_inicio
+jugador = pacman(pac_x_inic * 20, pac_y_inic * 20, round(v_final, 2))
 pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
-info_bots = ((x_inicial, y_inicial), jugador.direccion)
 
 # creacion de los fantasmas
 bx, by = random.choice(ghost_spawn)
@@ -103,6 +103,7 @@ salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 
 puntaje = 0
 vidas = 100
+ultimo_chequeo_puntos = 0
 
 # loop del juego
 while playing:
@@ -110,52 +111,40 @@ while playing:
     text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white)
         
     pantalla.fill((0, 0, 0))
-    revision = round(segundos)
-    if revision % 3 == 0:
+    if segundos - ultimo_chequeo_puntos >= 3:
         hay_puntos = False
         for item in dic_mapa.values():
             if item == 'punto' or item == 'power':
                 hay_puntos = True
                 break
+            
         if hay_puntos:
             pass
         else:
             dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
-            for numero, casilla in dic_mapa.items():
-                if casilla == 'inicio':
-                    x_inicial, y_inicial = numero
-                    jugador.posx = x_inicial * 20
-                    jugador.posy = y_inicial * 20
-                    break
-
-        contador = 0
+            jugador.posx = pac_x_inic * 20
+            jugador.posy = pac_y_inic * 20
+                
+        ultimo_chequeo_puntos = segundos
         
+    # Renderizado
     renderizado(pantalla, dic_mapa, graficos)
     snapshot = deepcopy(dic_mapa)
     dic_mapa, puntaje = jugador.frame_pacman(snapshot, puntaje)
+            
+    info_bots = (jugador.casilla, jugador.direccion)        
     
-    if jugador.posicion_perfecta():
-        info_bots = ((jugador.posx/20, jugador.posy/20), jugador.direccion)
-        
-    render = blinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b)
+    blinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla)
     blinky_rect.topleft = (blinky.posx, blinky.posy)
-    if render != None:
-        pos_b = render
         
-    render = blinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla, pos_b2)
+    blinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla)
     blinky2_rect.topleft = (blinky2.posx, blinky2.posy)
-    if render != None:
-        pos_b2 = render
         
-    render = pinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b3)
+    pinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla)
     pinky_rect.topleft = (pinky.posx, pinky.posy)
-    if render != None:
-        pos_b3 = render
         
-    render = pinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla, pos_b4)
+    pinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla)
     pinky2_rect.topleft = (pinky2.posx, pinky2.posy)
-    if render != None:
-        pos_b4 = render
 
     pantalla.blit(text_surface, (100, 620))
 
