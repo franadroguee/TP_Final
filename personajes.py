@@ -232,11 +232,12 @@ class pacman(personaje):
         return mapa, puntaje, comio_powerpellet
 
 class fantasma(personaje):
-    def __init__(self, posx, posy, velocidad, nombre):
+    def __init__(self, posx, posy, velocidad, nombre, spawn: tuple):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
         self.salio_house = False
         self.modo = 'scatter' # scatter, chase, scare
+        self.spawn = spawn
 
     def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla) -> None:
         if self.posicion_perfecta():
@@ -245,23 +246,32 @@ class fantasma(personaje):
         if self.casilla not in ghost_places:
             self.salio_house = True
             
-        if not self.salio_house:    
-            self.direccion = self.dirigirse_a_casilla((14, 0), mapa)
+        if not self.salio_house:   
+            if self.posicion_perfecta(): 
+                self.direccion = self.dirigirse_a_casilla((14, 0), mapa)
+                
+            if self.debe_moverse(mapa):
+                self.movimeinto()
             pantalla.blit(grafico, (self.posx, self.posy))
             return None
                      
         if self.posicion_perfecta():
             self.chequeo_tunel(mapa)
             if self.modo == 'scatter':
-                self.scatter((0, 0), mapa)
+                self.direccion = self.scatter((0, 31), mapa)
             elif self.modo == 'chase':
                 if self.nombre == 'blinky':
                     self.direccion = self.blinky_chase(info_bots, mapa)
                 elif self.nombre == 'pinky':
                     self.direccion = self.pinky_chase(info_bots, mapa)
+                    
+            elif self.modo == 'volver_a_casa':
+                self.direccion = self.dirigirse_a_casilla((12, 13), mapa)
+                if self.casilla == (12, 13):
+                    self.cambio_de_modo('chase')
             else:
                 pos_pacman = info_bots[0]
-                self.scared(pos_pacman, mapa)            
+                self.direccion = self.scared(pos_pacman, mapa)            
                         
         if self.debe_moverse(mapa):
             self.movimeinto()

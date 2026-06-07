@@ -51,45 +51,50 @@ jugador = pacman(pac_x_inic * 20, pac_y_inic * 20, round(v_final, 2))
 pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
 
 # creacion de los fantasmas
+
+nombres_fantasmas = ['pinky', 'pinky', 'pinky', 'pinky']
+
+for i in range(4):
+    bx, by = random.choice(ghost_spawn)
+    spawn = (bx, by)
+
 bx, by = random.choice(ghost_spawn)
-fantasma1 = fantasma(bx*20, by*20, v_final, 'blinky')
+spawn = (bx, by)
+fantasma1 = fantasma(bx*20, by*20, v_final, 'blinky', spawn)
 fantasma1_rect = pygame.Rect(bx*20, by*20, 20, 20)
-start_fantasma1 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-fantasma2 = fantasma(bx*20, by*20, v_final, 'blinky')
+spawn = (bx, by)
+fantasma2 = fantasma(bx*20, by*20, v_final, 'blinky', spawn)
 fantasma2_rect = pygame.Rect(bx*20, by*20, 20, 20)
-start_fantasma2 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-fantasma3 = fantasma(bx*20, by*20, v_final, 'pinky')
+spawn = (bx, by)
+fantasma3 = fantasma(bx*20, by*20, v_final, 'pinky', spawn)
 fantasma3_rect = pygame.Rect(bx*20, by*20, 20, 20)
-start_fantasma3 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-fantasma4 = fantasma(bx*20, by*20, v_final, 'pinky')
+spawn = (bx, by)
+fantasma4 = fantasma(bx*20, by*20, v_final, 'pinky', spawn)
 fantasma4_rect = pygame.Rect(bx*20, by*20, 20, 20)
-start_fantasma4 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
+
+fantasmas = [fantasma1, fantasma2, fantasma3, fantasma4]
+fantasmas_rect = [fantasma1_rect, fantasma2_rect, fantasma3_rect, fantasma4_rect]
 
 def rotar_imagen(jugador):
-    if jugador.direccion == 'right':
-        superficie_jugador_r = pygame.transform.rotate(superficie_jugador, 0)
-        superficie_jugador_cerrado_r = pygame.transform.rotate(superficie_jugador_cerrado, 0)
-    elif jugador.direccion == 'left':
-        superficie_jugador_r = pygame.transform.flip(superficie_jugador, True, False)
-        superficie_jugador_cerrado_r = pygame.transform.flip(superficie_jugador_cerrado, True, False)
-    elif jugador.direccion == 'up':
-        superficie_jugador_r = pygame.transform.rotate(superficie_jugador, 90)
-        superficie_jugador_cerrado_r = pygame.transform.rotate(superficie_jugador_cerrado, 90)
-    elif jugador.direccion == 'down':
-        superficie_jugador_r = pygame.transform.rotate(superficie_jugador, 270)
-        superficie_jugador_cerrado_r = pygame.transform.rotate(superficie_jugador_cerrado, 270)
-        
-    return superficie_jugador_r, superficie_jugador_cerrado_r
+    transformaciones = {
+        'right': lambda imagen: pygame.transform.rotate(imagen, 0),
+        'left':  lambda imagen: pygame.transform.flip(imagen, True, False),
+        'up':    lambda imagen: pygame.transform.rotate(imagen, 90),
+        'down':  lambda imagen: pygame.transform.rotate(imagen, 270),
+    }
+    
+    t = transformaciones[jugador.direccion]
+    return t(superficie_jugador), t(superficie_jugador_cerrado)        
 
 salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 
@@ -123,21 +128,17 @@ while playing:
     # Renderizado
     renderizado(pantalla, dic_mapa, graficos)
     dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje)
-            
+         
+    if comio_powerpellet:
+        for ghost in fantasmas:
+            ghost.cambio_de_modo('scared')     
+                   
     info_bots = (jugador.casilla, jugador.direccion)        
     
-    fantasma1.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma1.nombre], pantalla)
-    fantasma1_rect.topleft = (fantasma1.posx, fantasma1.posy)
-        
-    fantasma2.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma2.nombre], pantalla)
-    fantasma2_rect.topleft = (fantasma2.posx, fantasma2.posy)
-        
-    fantasma3.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma3.nombre], pantalla)
-    fantasma3_rect.topleft = (fantasma3.posx, fantasma3.posy)
-        
-    fantasma4.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma4.nombre], pantalla)
-    fantasma4_rect.topleft = (fantasma4.posx, fantasma4.posy)
-
+    for ghost, rect in zip(fantasmas, fantasmas_rect):
+        ghost.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[ghost.nombre], pantalla)
+        rect.topleft = (ghost.posx, ghost.posy)
+    
     pantalla.blit(text_surface, (100, 620))
 
     abnierto, cerrado = rotar_imagen(jugador)
@@ -152,26 +153,20 @@ while playing:
 
     pygame.display.update()
     
-    if pacman_rect.colliderect(fantasma1_rect) or pacman_rect.colliderect(fantasma2_rect) or pacman_rect.colliderect(fantasma3_rect) or pacman_rect.colliderect(fantasma4_rect):
-        vidas -= 1
-        for numero, casilla in dic_mapa.items():
-            if casilla == 'inicio':
-                x_inicial, y_inicial = numero
-                jugador.posx = x_inicial * 20
-                jugador.posy = y_inicial * 20
-                break
-            
-        fantasma1.posx, fantasma1.posy = start_fantasma1
-        fantasma1.salio_house = False
-        
-        fantasma2.posx, fantasma2.posy = start_fantasma2
-        fantasma2.salio_house = False
-        
-        fantasma3.posx, fantasma3.posy = start_fantasma3
-        fantasma3.salio_house = False
-        
-        fantasma4.posx, fantasma4.posy = start_fantasma4
-        fantasma4.salio_house = False
+    for ghost, rect in zip(fantasmas, fantasmas_rect):
+        if pacman_rect.colliderect(rect):
+            vidas -= 1
+            for numero, casilla in dic_mapa.items():
+                if casilla == 'inicio':
+                    x_inicial, y_inicial = numero
+                    jugador.posx = x_inicial * 20
+                    jugador.posy = y_inicial * 20
+                    break
+                
+            for ghost in fantasmas:
+                ghost.posx = ghost.spawn[0] * 20
+                ghost.posy = ghost.spawn[1] * 20
+                ghost.salio_house = False
 
         
     if vidas == 0:
