@@ -160,7 +160,7 @@ class pacman(personaje):
         
         self.direccion = self.direccion_deseada
 
-    def analisis_comer(self, mapa: dict, puntaje) -> dict | int:
+    def analisis_comer(self, mapa: dict, puntaje) -> dict | int | bool:
         """
         A ejecutarse cuando el personaje esta centrado en una casilla. Si la casilla tiene un comestible (punto, powerpellet), lo remueve del mapa y registra la accion
         """
@@ -168,13 +168,16 @@ class pacman(personaje):
         x = int(self.posx / 20)
         y = int(self.posy / 20)
         
+        comio_powerpellet = False
         if mapa[(x, y)] == 'punto': 
             mapa[(x, y)] = 'pasillo' # remueve el punto del mapa
             puntaje += 10 # suma 10 puntos por el consumible "punto"
         elif  mapa[(x, y)] == 'power':
             mapa[(x, y)] = 'pasillo'
             puntaje += 20 # suma 20 puntos por el consumible "PowerPellet"
-        return mapa, puntaje                 
+            comio_powerpellet = True
+            
+        return mapa, puntaje, comio_powerpellet            
         
     def debe_moverse(self, mapa:dict) -> bool:
         """
@@ -209,10 +212,11 @@ class pacman(personaje):
         
         self.direccion_deseada = tecla
         
-    def frame_pacman(self, mapa: dict, puntaje: int) -> dict | int:
+    def frame_pacman(self, mapa: dict, puntaje: int) -> dict | int | bool:
         """
         Se ejecuta todos los frames. Procesa todas las acciones del personaje (movimiento, comestibles, etc.). Devuelve el diccionario con el mapa actualizado y el nuevo puntaje del jugador
         """
+        comio_powerpellet = False
         if self.direccion_deseada != self.direccion and self.puede_cambiar_direccion(mapa):
             # si pacman desea ir en una direccion distinta a la que esta yendo y esta centrado
             self.cambio_direccion()
@@ -222,16 +226,17 @@ class pacman(personaje):
             
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
-            mapa, puntaje = self.analisis_comer(mapa, puntaje)
+            mapa, puntaje, comio_powerpellet = self.analisis_comer(mapa, puntaje)
             self.chequeo_tunel(mapa)
             
-        return mapa, puntaje
+        return mapa, puntaje, comio_powerpellet
 
 class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
         self.salio_house = False
+        self.modo = 'scatter' # scatter, chase, scare
 
     def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla) -> None:
         if self.posicion_perfecta():
@@ -240,22 +245,26 @@ class fantasma(personaje):
         if self.casilla not in ghost_places:
             self.salio_house = True
             
-        if self.salio_house:    
-            objetivo = info_bots
-        else:
-            objetivo = ((14, 0), None)
-            
+        if not self.salio_house:    
+            self.direccion = self.dirigirse_a_casilla((14, 0), mapa)
+            pantalla.blit(grafico, (self.posx, self.posy))
+            return None
+                     
         if self.posicion_perfecta():
             self.chequeo_tunel(mapa)
-            
-            if self.nombre == 'blinky':
-                self.direccion = self.blinky_chase(objetivo, mapa)
-            elif self.nombre == 'pinky':
-                self.direccion = self.pinky_chase(objetivo, mapa)
+            if self.modo == 'scatter':
+                self.scatter((0, 0), mapa)
+            elif self.modo == 'chase':
+                if self.nombre == 'blinky':
+                    self.direccion = self.blinky_chase(info_bots, mapa)
+                elif self.nombre == 'pinky':
+                    self.direccion = self.pinky_chase(info_bots, mapa)
+            else:
+                pos_pacman = info_bots[0]
+                self.scared(pos_pacman, mapa)            
                         
         if self.debe_moverse(mapa):
             self.movimeinto()
-
             
         pantalla.blit(grafico, (self.posx, self.posy))
         
@@ -319,8 +328,7 @@ class fantasma(personaje):
                 dist_min = dist
                 
         return dir_min
-
-    
+ 
     def scatter(self, esquina, mapa) -> str:
         """
         Recibe la esquina en la que el fantasma ejecuta "scatter" y dirije al fantasma hacia ella mediante la direccion contenida en un str.
@@ -333,7 +341,7 @@ class fantasma(personaje):
         Recibe la posicion del fantasma cuando este esta centrado en una casilla y devuelve un string con la direccion que debe tomar para dirigirse a su casilla de destino.
         """
         
-        pac_pos, pac_dir = info_pacman
+        pac_pos = info_pacman[0]
                         
         return self.dirigirse_a_casilla(pac_pos, mapa)
     
@@ -353,3 +361,46 @@ class fantasma(personaje):
         obj = sumar_posiciones((pac_x, pac_y), (suma))
         
         return self.dirigirse_a_casilla(obj, mapa)
+    
+    def scared(self, pos_pacman, mapa):
+        """
+        Recibe la posicion de Pac_man y calcula que direccion le permite alejarse mas de este.
+        """
+
+        x = (self.posx)/20
+        y = (self.posy)/20
+        
+        direcciones_disponibles = []
+        direccion_opuesta = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
+        direcciones_posibles = {'left': (int(x-1), int(y)), 'right': (int(x+1), int(y)), 'up': (int(x), int(y-1)), 'down': (int(x), int(y+1))}
+        
+        direcciones_posibles.pop(direccion_opuesta[self.direccion])
+        
+        for dir, casilla in direcciones_posibles.items():
+            
+            if not self.salio_house and mapa[casilla] == 'puerta':
+                direcciones_disponibles.append((dir, casilla))
+
+            if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
+                direcciones_disponibles.append((dir, casilla))
+                
+        
+        dist_min = float(0)
+        for dir, casilla in direcciones_disponibles:
+            dist = distancia(casilla, (pos_pacman))
+            if dist > dist_min:
+                dir_min = dir
+                dist_min = dist
+                
+        return dir_min
+
+    def cambio_de_modo(self, nuevo_modo: str) -> None:
+        """
+        Cambia el modo del fantasma al modo deseado (scatter, chase, scare). Al hacerlo, el fantasma invierte su direccion
+        """
+        
+        direcciones_opuestas = {'right': 'left', 'left': 'right', 'up': 'down', 'down': 'up'}
+        
+        direccion_opuesta = direcciones_opuestas[self.direccion]
+        self.direccion = direccion_opuesta
+        self.modo = nuevo_modo

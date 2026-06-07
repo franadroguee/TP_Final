@@ -23,9 +23,6 @@ graficos = {
 superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
 superficie_jugador_cerrado = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man_Cerrado.png'))
 
-superficie_blinky = pygame.image.load(os.path.join(carpeta_graficos, 'blinky.png'))
-superficie_pinky = pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png'))
-
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
 
@@ -55,31 +52,27 @@ pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
 
 # creacion de los fantasmas
 bx, by = random.choice(ghost_spawn)
-blinky = fantasma(bx*20, by*20, v_final, 'blinky')
-blinky_rect = pygame.Rect(bx*20, by*20, 20, 20)
-pos_b = (bx, by)
-start_b = (bx*20, by*20)
+fantasma1 = fantasma(bx*20, by*20, v_final, 'blinky')
+fantasma1_rect = pygame.Rect(bx*20, by*20, 20, 20)
+start_fantasma1 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-blinky2 = fantasma(bx*20, by*20, v_final, 'blinky')
-blinky2_rect = pygame.Rect(bx*20, by*20, 20, 20)
-pos_b2 = (bx, by)
-start_b2 = (bx*20, by*20)
+fantasma2 = fantasma(bx*20, by*20, v_final, 'blinky')
+fantasma2_rect = pygame.Rect(bx*20, by*20, 20, 20)
+start_fantasma2 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-pinky = fantasma(bx*20, by*20, v_final, 'pinky')
-pinky_rect = pygame.Rect(bx*20, by*20, 20, 20)
-pos_b3 = (bx, by)
-start_b3 = (bx*20, by*20)
+fantasma3 = fantasma(bx*20, by*20, v_final, 'pinky')
+fantasma3_rect = pygame.Rect(bx*20, by*20, 20, 20)
+start_fantasma3 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 bx, by = random.choice(ghost_spawn)
-pinky2 = fantasma(bx*20, by*20, v_final, 'pinky')
-pinky2_rect = pygame.Rect(bx*20, by*20, 20, 20)
-pos_b4 = (bx, by)
-start_b4 = (bx*20, by*20)
+fantasma4 = fantasma(bx*20, by*20, v_final, 'pinky')
+fantasma4_rect = pygame.Rect(bx*20, by*20, 20, 20)
+start_fantasma4 = (bx*20, by*20)
 ghost_spawn.remove((bx, by))
 
 def rotar_imagen(jugador):
@@ -129,22 +122,21 @@ while playing:
         
     # Renderizado
     renderizado(pantalla, dic_mapa, graficos)
-    snapshot = deepcopy(dic_mapa)
-    dic_mapa, puntaje = jugador.frame_pacman(snapshot, puntaje)
+    dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje)
             
     info_bots = (jugador.casilla, jugador.direccion)        
     
-    blinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla)
-    blinky_rect.topleft = (blinky.posx, blinky.posy)
+    fantasma1.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma1.nombre], pantalla)
+    fantasma1_rect.topleft = (fantasma1.posx, fantasma1.posy)
         
-    blinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_blinky, pantalla)
-    blinky2_rect.topleft = (blinky2.posx, blinky2.posy)
+    fantasma2.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma2.nombre], pantalla)
+    fantasma2_rect.topleft = (fantasma2.posx, fantasma2.posy)
         
-    pinky.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla)
-    pinky_rect.topleft = (pinky.posx, pinky.posy)
+    fantasma3.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma3.nombre], pantalla)
+    fantasma3_rect.topleft = (fantasma3.posx, fantasma3.posy)
         
-    pinky2.frame_ghost(ghost_places, dic_mapa, info_bots, superficie_pinky, pantalla)
-    pinky2_rect.topleft = (pinky2.posx, pinky2.posy)
+    fantasma4.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[fantasma4.nombre], pantalla)
+    fantasma4_rect.topleft = (fantasma4.posx, fantasma4.posy)
 
     pantalla.blit(text_surface, (100, 620))
 
@@ -160,7 +152,7 @@ while playing:
 
     pygame.display.update()
     
-    if pacman_rect.colliderect(blinky_rect) or pacman_rect.colliderect(blinky2_rect) or pacman_rect.colliderect(pinky_rect) or pacman_rect.colliderect(pinky2_rect):
+    if pacman_rect.colliderect(fantasma1_rect) or pacman_rect.colliderect(fantasma2_rect) or pacman_rect.colliderect(fantasma3_rect) or pacman_rect.colliderect(fantasma4_rect):
         vidas -= 1
         for numero, casilla in dic_mapa.items():
             if casilla == 'inicio':
@@ -169,17 +161,17 @@ while playing:
                 jugador.posy = y_inicial * 20
                 break
             
-        blinky.posx, blinky.posy = start_b
-        blinky.salio_house = False
+        fantasma1.posx, fantasma1.posy = start_fantasma1
+        fantasma1.salio_house = False
         
-        blinky2.posx, blinky2.posy = start_b2
-        blinky2.salio_house = False
+        fantasma2.posx, fantasma2.posy = start_fantasma2
+        fantasma2.salio_house = False
         
-        pinky.posx, pinky.posy = start_b3
-        pinky.salio_house = False
+        fantasma3.posx, fantasma3.posy = start_fantasma3
+        fantasma3.salio_house = False
         
-        pinky2.posx, pinky2.posy = start_b4
-        pinky2.salio_house = False
+        fantasma4.posx, fantasma4.posy = start_fantasma4
+        fantasma4.salio_house = False
 
         
     if vidas == 0:
