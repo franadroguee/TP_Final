@@ -9,6 +9,26 @@ pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
 carpeta_graficos = 'graficos'
 
+fases = [
+    ("scatter", 7),
+    ("chase",   20),
+    ("scatter", 7),
+    ("chase",   20),
+    ("scatter", 5),
+    ("chase",   20),
+    ("scatter", 5),
+    ("chase",   None),
+]
+
+def fase_actual(tiempo):
+    for modo, duracion_modo in fases:
+        if duracion_modo == None:
+            return modo
+        elif tiempo < modo:
+            return modo
+        else: 
+            tiempo -= duracion_modo
+
 graficos = {
     'pared': pygame.image.load(os.path.join(carpeta_graficos, 'pared.png')),
     'pasillo': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
@@ -18,7 +38,8 @@ graficos = {
     'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
     'blinky': pygame.image.load(os.path.join(carpeta_graficos, 'blinky.png')),
     'pinky': pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png')), 
-    'scared': pygame.image.load(os.path.join(carpeta_graficos, 'scared_ghost.png'))
+    'scared': pygame.image.load(os.path.join(carpeta_graficos, 'scared_ghost.png')),
+    'volver_a_casa': pygame.image.load(os.path.join(carpeta_graficos, 'volver_a_casa.png'))
     }
 
 superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
@@ -57,12 +78,14 @@ nombres_fantasmas = ['pinky', 'blinky', 'pinky', 'pinky']
 esquinas_fantasmas = [(0, 0), (28, 0), (0, 31), (28, 31)]
 fantasmas = []
 rects_fantasmas = []
+posiciones_fantasmas = []
 
 for i in range(4):
     bx, by = random.choice(ghost_spawn)
     spawn = (bx, by)
     f = fantasma(bx*20, by*20, 1, nombres_fantasmas[i], spawn, esquinas_fantasmas[i])
     fantasmas.append(f)
+    posiciones_fantasmas.append(f.casilla)
     rects_fantasmas.append(pygame.Rect(bx*20, by*20, 20, 20))
     ghost_spawn.remove((bx, by))
 
@@ -83,12 +106,14 @@ salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 puntaje = 0
 vidas = 3
 ultimo_chequeo_puntos = 0
-ultimo_powerpellet_comido = float('inf')
+ultimo_powerpellet_comido = 0
+modod_fantasmas_global = 'scatter'
 # loop del juego
 while playing:
-    segundos = pygame.time.get_ticks()/1000
-    text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white)
+    segundos = pygame.time.get_ticks()/1000 #tiempo de juego
+    text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white) # actualizacion puntaje
         
+    # chequeo de puntos ----------------------------------------------------------------
     if segundos - ultimo_chequeo_puntos >= 3:
         hay_puntos = False
         for item in dic_mapa.values():
@@ -99,7 +124,7 @@ while playing:
         if hay_puntos:
             pass
         else:
-            dic_mapa = mapa(pantalla, 'mapa.txt', graficos)
+            dic_mapa = mapa('mapa.txt', graficos)
             jugador.posx = pac_x_inic * 20
             jugador.posy = pac_y_inic * 20
                 
@@ -107,10 +132,11 @@ while playing:
  
     pantalla.fill((0, 0, 0))
         
-    # Renderizado
+    # Renderizado del mapa -----------------------------------------------------------------------------------
     renderizado(pantalla, dic_mapa, graficos)
     dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje)
          
+    # efecto de los powerpellets ------------------------------------------------------------------
     if comio_powerpellet:
         ultimo_powerpellet_comido = segundos
         for ghost in fantasmas:
@@ -120,16 +146,18 @@ while playing:
     if segundos - ultimo_powerpellet_comido > 5:
         for ghost in fantasmas:
             if ghost.modo not in ['salir_de_casa', 'volver_a_casa']:
-                ghost.cambio_de_modo('chase')     
-
-                   
+                ghost.cambio_de_modo(modod_fantasmas_global) 
+ 
     info_bots = (jugador.casilla, jugador.direccion)        
     
     for f, rect in zip(fantasmas, rects_fantasmas):
-        if f.modo != 'scared':
+        if f.modo in ['chase', 'scatter', 'salir_de_casa']:
             f.frame_ghost(ghost_places, dic_mapa, info_bots, graficos[f.nombre], pantalla)
-        else:
+        elif f.modo == 'scared':
             f.frame_ghost(ghost_places, dic_mapa, info_bots, graficos['scared'], pantalla)
+        else:
+            f.frame_ghost(ghost_places, dic_mapa, info_bots, graficos['volver_a_casa'], pantalla)
+            
         rect.topleft = (f.posx, f.posy)
     
     pantalla.blit(text_surface, (100, 620))
@@ -146,6 +174,7 @@ while playing:
 
     pygame.display.update()
     
+    #  Colisiones -----------------------------------------------------------------------
     for ghost, rect in zip(fantasmas, rects_fantasmas):
         if pacman_rect.colliderect(rect):
             if ghost.modo == 'scared':
@@ -168,10 +197,11 @@ while playing:
                     ghost.posy = ghost.spawn[1] * 20
                     ghost.modo = 'salir_de_casa'
 
-        
+    # GAME OVER ---------------------------------------------------------------------------
     if vidas == 0:
         playing = False
     
+    # recepcion input ---------------------------------------------------------------------
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
             pygame.quit()
