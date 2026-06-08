@@ -239,7 +239,7 @@ class fantasma(personaje):
         self.spawn = spawn
         self.esquina = esquina
 
-    def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla) -> None:
+    def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, blinky_pos: tuple) -> None:
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
             
@@ -259,12 +259,18 @@ class fantasma(personaje):
                     self.direccion = self.blinky_chase(info_bots, mapa)
                 elif self.nombre == 'pinky':
                     self.direccion = self.pinky_chase(info_bots, mapa)
+                elif self.nombre == 'inky':
+                    self.direccion = self.inky_chase(info_bots, mapa, blinky_pos)
+                elif self.nombre == 'clyde':
+                    self.direccion = self.clyde_chase(info_bots, mapa)
                     
             elif self.modo == 'volver_a_casa':
                 self.direccion = self.dirigirse_a_casilla((15,13), mapa)
                 if self.casilla == (15,13):
                     self.cambio_de_modo('salir_de_casa')
-                    self.velocidad /= 10
+                    self.velocidad = velocidad_normal_fantasma
+
+                    
                 
             else:
                 pos_pacman = info_bots[0]
@@ -370,6 +376,30 @@ class fantasma(personaje):
         
         return self.dirigirse_a_casilla(obj, mapa)
     
+    def inky_chase(self, info_bots, mapa, blinky_pos):
+        tiles_direccion = {'right': (2, 0), 'left': (-2, 0), 'up': (0, -2), 'down': (0, 2)}
+        pac_pos, pac_dir = info_bots
+        pac_x, pac_y = pac_pos
+        if pac_dir == None:
+            suma = (0, 0)
+        else:
+            suma = tiles_direccion[pac_dir]
+            
+        pac_pos_mas_dos = sumar_posiciones((pac_x, pac_y), (suma))
+
+        bx, by = blinky_pos
+        casilla_objetivo = sumar_posiciones(pac_pos_mas_dos, (-bx, -by))
+        objx, objy = casilla_objetivo
+
+        return self.dirigirse_a_casilla((objx * 2, objy *2), mapa)
+    
+    def clyde_chase(self, info_bots, mapa):
+        pos_pacman = info_bots[0]
+        if distancia(self.casilla, pos_pacman) >= 8:
+            return self.dirigirse_a_casilla(pos_pacman, mapa)
+        else:
+            return self.dirigirse_a_casilla(self.esquina, mapa)
+
     def scared(self, pos_pacman, mapa):
         """
         Recibe la posicion de Pac_man y calcula que direccion le permite alejarse mas de este.
