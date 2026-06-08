@@ -232,33 +232,28 @@ class pacman(personaje):
         return mapa, puntaje, comio_powerpellet
 
 class fantasma(personaje):
-    def __init__(self, posx, posy, velocidad, nombre, spawn: tuple):
+    def __init__(self, posx, posy, velocidad, nombre, spawn: tuple, esquina: tuple):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
-        self.salio_house = False
-        self.modo = 'scatter' # scatter, chase, scare
+        self.modo = 'salir_house' # scatter, chase, scare
         self.spawn = spawn
+        self.esquina = esquina
 
     def frame_ghost(self, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla) -> None:
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
             
-        if self.casilla not in ghost_places:
-            self.salio_house = True
-            
-        if not self.salio_house:   
-            if self.posicion_perfecta(): 
-                self.direccion = self.dirigirse_a_casilla((14, 0), mapa)
-                
-            if self.debe_moverse(mapa):
-                self.movimeinto()
-            pantalla.blit(grafico, (self.posx, self.posy))
-            return None
-                     
+        if self.casilla not in ghost_places and self.modo == 'salir_house':
+            self.modo = 'scatter'
+                                                 
         if self.posicion_perfecta():
             self.chequeo_tunel(mapa)
             if self.modo == 'scatter':
-                self.direccion = self.scatter((0, 31), mapa)
+                self.direccion = self.scatter(self.esquina, mapa)
+                
+            elif self.modo == 'salir_house':   
+                self.direccion = self.dirigirse_a_casilla((14, 0), mapa)
+                
             elif self.modo == 'chase':
                 if self.nombre == 'blinky':
                     self.direccion = self.blinky_chase(info_bots, mapa)
@@ -266,9 +261,11 @@ class fantasma(personaje):
                     self.direccion = self.pinky_chase(info_bots, mapa)
                     
             elif self.modo == 'volver_a_casa':
-                self.direccion = self.dirigirse_a_casilla((12, 13), mapa)
-                if self.casilla == (12, 13):
-                    self.cambio_de_modo('chase')
+                self.direccion = self.dirigirse_a_casilla((15,13), mapa)
+                if self.casilla == (15,13):
+                    self.cambio_de_modo('salir_house')
+                    self.velocidad /= 10
+                
             else:
                 pos_pacman = info_bots[0]
                 self.direccion = self.scared(pos_pacman, mapa)            
@@ -296,7 +293,7 @@ class fantasma(personaje):
             elif self.direccion == 'down':
                 siguiente_casilla = (x, y+1)
             
-            if not self.salio_house and mapa[siguiente_casilla] == 'puerta':
+            if (self.modo == 'salir_house' or self.modo == 'volver_a_casa') and mapa[siguiente_casilla] == 'puerta':
                 return True
             
             if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
@@ -323,7 +320,7 @@ class fantasma(personaje):
         
         for dir, casilla in direcciones_posibles.items():
             
-            if not self.salio_house and mapa[casilla] == 'puerta':
+            if (self.modo == 'salir_house' or self.modo == 'volver_a_casa') and mapa[casilla] == 'puerta':
                 direcciones_disponibles.append((dir, casilla))
 
             if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
@@ -331,6 +328,7 @@ class fantasma(personaje):
                 
         
         dist_min = float('inf')
+        dir_min = self.direccion
         for dir, casilla in direcciones_disponibles:
             dist = distancia(casilla, (objetivo))
             if dist < dist_min:
@@ -388,7 +386,7 @@ class fantasma(personaje):
         
         for dir, casilla in direcciones_posibles.items():
             
-            if not self.salio_house and mapa[casilla] == 'puerta':
+            if (self.modo == 'salir_house' or self.modo == 'volver_a_casa') and mapa[casilla] == 'puerta':
                 direcciones_disponibles.append((dir, casilla))
 
             if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
@@ -396,6 +394,7 @@ class fantasma(personaje):
                 
         
         dist_min = float(0)
+        dir_min = self.direccion
         for dir, casilla in direcciones_disponibles:
             dist = distancia(casilla, (pos_pacman))
             if dist > dist_min:
@@ -408,9 +407,9 @@ class fantasma(personaje):
         """
         Cambia el modo del fantasma al modo deseado (scatter, chase, scare). Al hacerlo, el fantasma invierte su direccion
         """
-        
-        direcciones_opuestas = {'right': 'left', 'left': 'right', 'up': 'down', 'down': 'up'}
-        
-        direccion_opuesta = direcciones_opuestas[self.direccion]
-        self.direccion = direccion_opuesta
-        self.modo = nuevo_modo
+        if nuevo_modo != self.modo:
+            direcciones_opuestas = {'right': 'left', 'left': 'right', 'up': 'down', 'down': 'up'}
+            
+            direccion_opuesta = direcciones_opuestas[self.direccion]
+            self.direccion = direccion_opuesta
+            self.modo = nuevo_modo

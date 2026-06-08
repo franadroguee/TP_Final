@@ -1,6 +1,6 @@
 import pygame
 
-def mapa(pantalla, ruta_archivo: str, graficos: dict) -> dict:
+def mapa(ruta_archivo: str, graficos: dict) -> dict:
     '''
     Recibe la ruta del archivo del mapa y lo analiza. Segun corresponda, inserta en la ventana de PyGame, el .png del grafico que corresponda y ademas devuelve un diccionario con la informacion de todo el mapa en formato key=(x, y) value=str.
     
@@ -18,25 +18,18 @@ def mapa(pantalla, ruta_archivo: str, graficos: dict) -> dict:
         for fila in mapa:
             for letra in fila:
                 if letra == 'X': # pared
-                    pantalla.blit(graficos['pared'], ((x * 20), (y * 20))) # carga el grafico
                     dic_mapa[(x, y)] = 'pared' # adjunta la pos. al diccionario
                 elif letra == '.': # punto
-                    pantalla.blit(graficos['punto'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'punto'
                 elif letra == ' ': # pasillo
-                    pantalla.blit(graficos['pasillo'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'pasillo'
                 elif letra == 'G': # Ghost house
-                    pantalla.blit(graficos['pasillo'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'ghost'
                 elif letra == 'o': # PowerPellet
-                    pantalla.blit(graficos['power'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'power'
                 elif letra == '-': # puerta ghost house
-                    pantalla.blit(graficos['puerta'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'puerta'
                 elif letra == 'T': # tunel lateral
-                    pantalla.blit(graficos['tunel'], ((x * 20), (y * 20)))
                     dic_mapa[(x, y)] = 'tunel'
                 elif letra == 'P':
                     dic_mapa[(x, y)] = 'inicio'
