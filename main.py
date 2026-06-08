@@ -114,12 +114,12 @@ while playing:
     if comio_powerpellet:
         ultimo_powerpellet_comido = segundos
         for ghost in fantasmas:
-            if ghost.modo not in ['salir_house', 'volver_a_casa']:
+            if ghost.modo not in ['salir_de_casa', 'volver_a_casa']:
                 ghost.cambio_de_modo('scared')     
             
     if segundos - ultimo_powerpellet_comido > 5:
         for ghost in fantasmas:
-            if ghost.modo not in ['salir_house', 'volver_a_casa']:
+            if ghost.modo not in ['salir_de_casa', 'volver_a_casa']:
                 ghost.cambio_de_modo('chase')     
 
                    
@@ -166,7 +166,7 @@ while playing:
                 for ghost in fantasmas:
                     ghost.posx = ghost.spawn[0] * 20
                     ghost.posy = ghost.spawn[1] * 20
-                    ghost.modo = 'salir_house'
+                    ghost.modo = 'salir_de_casa'
 
         
     if vidas == 0:

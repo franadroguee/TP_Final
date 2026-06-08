@@ -235,7 +235,7 @@ class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre, spawn: tuple, esquina: tuple):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
-        self.modo = 'salir_house' # scatter, chase, scare
+        self.modo = 'salir_de_casa' # scatter, chase, scare
         self.spawn = spawn
         self.esquina = esquina
 
@@ -243,7 +243,7 @@ class fantasma(personaje):
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
             
-        if self.casilla not in ghost_places and self.modo == 'salir_house':
+        if self.casilla not in ghost_places and self.modo == 'salir_de_casa':
             self.modo = 'scatter'
                                                  
         if self.posicion_perfecta():
@@ -251,7 +251,7 @@ class fantasma(personaje):
             if self.modo == 'scatter':
                 self.direccion = self.scatter(self.esquina, mapa)
                 
-            elif self.modo == 'salir_house':   
+            elif self.modo == 'salir_de_casa':   
                 self.direccion = self.dirigirse_a_casilla((14, 0), mapa)
                 
             elif self.modo == 'chase':
@@ -263,7 +263,7 @@ class fantasma(personaje):
             elif self.modo == 'volver_a_casa':
                 self.direccion = self.dirigirse_a_casilla((15,13), mapa)
                 if self.casilla == (15,13):
-                    self.cambio_de_modo('salir_house')
+                    self.cambio_de_modo('salir_de_casa')
                     self.velocidad /= 10
                 
             else:
@@ -293,7 +293,7 @@ class fantasma(personaje):
             elif self.direccion == 'down':
                 siguiente_casilla = (x, y+1)
             
-            if (self.modo == 'salir_house' or self.modo == 'volver_a_casa') and mapa[siguiente_casilla] == 'puerta':
+            if (self.modo == 'salir_de_casa' or self.modo == 'volver_a_casa') and mapa[siguiente_casilla] == 'puerta':
                 return True
             
             if mapa[siguiente_casilla] == 'pared' or mapa[siguiente_casilla] == 'puerta':
@@ -320,7 +320,7 @@ class fantasma(personaje):
         
         for dir, casilla in direcciones_posibles.items():
             
-            if (self.modo == 'salir_house' or self.modo == 'volver_a_casa') and mapa[casilla] == 'puerta':
+            if (self.modo == 'salir_de_casa' or self.modo == 'volver_a_casa') and mapa[casilla] == 'puerta':
                 direcciones_disponibles.append((dir, casilla))
 
             if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
@@ -386,7 +386,7 @@ class fantasma(personaje):
         
         for dir, casilla in direcciones_posibles.items():
             
-            if (self.modo == 'salir_house' or self.modo == 'volver_a_casa') and mapa[casilla] == 'puerta':
+            if (self.modo == 'salir_de_casa' or self.modo == 'volver_a_casa') and mapa[casilla] == 'puerta':
                 direcciones_disponibles.append((dir, casilla))
 
             if mapa[(casilla)] != 'pared' and mapa[casilla] != 'puerta':
