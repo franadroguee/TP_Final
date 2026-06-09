@@ -240,6 +240,7 @@ class fantasma(personaje):
         self.esquina = esquina
 
     def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, blinky_pos: tuple) -> None:
+        "A ejecutarse todos los frames. Revisa, primero si "
         if self.modo == None:
             pantalla.blit(grafico, (self.posx, self.posy))
             return None

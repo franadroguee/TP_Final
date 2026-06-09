@@ -4,10 +4,12 @@ from mapa import mapa, renderizado
 from personajes import pacman, fantasma
 import random
 
+# inicializacion de pygame -----------------------------------------------------------
 pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
 carpeta_graficos = 'graficos'
 
+# modos globales --------------------------------------------------------------------------------------
 fases = [
     ("scatter", 7),
     ("chase",   20),
@@ -20,14 +22,20 @@ fases = [
 ]
 
 def fase_actual(tiempo):
+    """
+    Devuelve un str con la fase actual, dependiendo de cuanto tiempo haya corrido el juego
+    """
+    
     for modo, duracion_modo in fases:
-        if duracion_modo == None:
+        if duracion_modo == None: # chase infinito
             return modo
-        elif tiempo < duracion_modo:
+        elif tiempo < duracion_modo: 
+            # si el tiempo es menor a la duracion del modo, el modo global es ese.
             return modo
         else: 
-            tiempo -= duracion_modo
+            tiempo -= duracion_modo # si no, se le resta el tiempo de ese modo y se intenta denuevo
 
+# sprites ---------------------------------------------------------------------------------------
 graficos = {
     'pared': pygame.image.load(os.path.join(carpeta_graficos, 'pared.png')),
     'pasillo': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
@@ -47,60 +55,7 @@ graficos = {
 superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
 superficie_jugador_cerrado = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man_Cerrado.png'))
 
-game_font = pygame.font.Font(None, 50)
-white = (255, 255, 255)
-
-# inicializacion de pygame
-playing = True
-clock = pygame.time.Clock()
-dic_mapa = mapa('mapa.txt', graficos)  
-ghost_spawn = []
-ghost_places = []
-
-# lectura casilla de inicio y ghost house
-for numero, casilla in dic_mapa.items():
-    if casilla == 'inicio':
-        casilla_de_inicio = numero
-    elif casilla == 'ghost':
-        ghost_spawn.append(numero)
-        ghost_places.append(numero)
-    if casilla == 'puerta':
-        ghost_places.append(numero)
-    
-# velocidades -----------------------------------------------
-velocidad_maxima = 7.5 # casillas / segundo
-velocidad_aplicada = velocidad_maxima * 20 / 60
-porcentaje_velocidad = lambda porcentaje: round((velocidad_aplicada * porcentaje / 100), 2)
-
-pac_x_inic, pac_y_inic = casilla_de_inicio
-jugador = pacman(pac_x_inic * 20, pac_y_inic * 20, porcentaje_velocidad(80))
-pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
-vida_extra_otorgada = False
-# creacion de los fantasmas
-
-nombres_fantasmas = ['pinky', 'blinky', 'clyde', 'inky']
-esquinas_fantasmas = [(0, 0), (28, 0), (0, 31), (28, 31)]
-fantasmas = []
-rects_fantasmas = []
-posiciones_fantasmas = []
-
-
-for i in range(4):
-    start_x, start_y = random.choice(ghost_spawn)
-    spawn = (start_x, start_y)
-    f = fantasma(start_x * 20, start_y * 20, porcentaje_velocidad(75), nombres_fantasmas[i], spawn, esquinas_fantasmas[i])
-    fantasmas.append(f)
-    posiciones_fantasmas.append(f.casilla)
-    rects_fantasmas.append(pygame.Rect(start_x * 20, start_y * 20, 20, 20))
-    ghost_spawn.remove((start_x, start_y))
-    
-if 'blinky' in nombres_fantasmas:
-    index = nombres_fantasmas.index('blinky')
-else:
-    index = random.randint(0, 3)
-    
-blinky_pos = posiciones_fantasmas[index]
-
+# manejo de los sprites ----------------------------------------------------------------
 def rotar_imagen_jugador(jugador):
     transformaciones = {
         'right': lambda imagen: pygame.transform.rotate(imagen, 0),
@@ -124,9 +79,66 @@ def rotar_grafico_fantasma(fantasma, imagen):
     return t(imagen)        
    
 
-salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
+salto = 0.2 # cada {salto} segundos, PacMan abre/ cierra la boca
 
+game_font = pygame.font.Font(None, 50)
+white = (255, 255, 255)
+
+# inicio de la logica del juego ------------------------------------------------------------------
+playing = True
+clock = pygame.time.Clock()
+dic_mapa = mapa('mapa.txt', graficos)  
+ghost_spawn = []
+ghost_places = []
+
+# lectura casilla de inicio y ghost house -----------------------------------------------------------
+for numero, casilla in dic_mapa.items():
+    if casilla == 'inicio':
+        casilla_de_inicio = numero
+    elif casilla == 'ghost':
+        ghost_spawn.append(numero)
+        ghost_places.append(numero)
+    if casilla == 'puerta':
+        ghost_places.append(numero)
+    
+# velocidades -----------------------------------------------
+velocidad_maxima = 7.5 # casillas / segundo
+velocidad_aplicada = velocidad_maxima * 20 / 60
+porcentaje_velocidad = lambda porcentaje: round((velocidad_aplicada * porcentaje / 100), 2)
+
+# inicializacion de pacman ---------------------------------------------------------
+pac_x_inic, pac_y_inic = casilla_de_inicio
+jugador = pacman(pac_x_inic * 20, pac_y_inic * 20, porcentaje_velocidad(80))
+pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
+vida_extra_otorgada = False
+
+# inicializacion de los fantasmas ------------------------------------------------------------
+nombres_fantasmas = ['pinky', 'blinky', 'clyde', 'inky']
+esquinas_fantasmas = [(0, 0), (28, 0), (0, 31), (28, 31)]
+fantasmas = []
+rects_fantasmas = []
+posiciones_fantasmas = []
+
+for i in range(4):
+    start_x, start_y = random.choice(ghost_spawn)
+    spawn = (start_x, start_y)
+    f = fantasma(start_x * 20, start_y * 20, porcentaje_velocidad(75), nombres_fantasmas[i], spawn, esquinas_fantasmas[i])
+    fantasmas.append(f)
+    posiciones_fantasmas.append(f.casilla)
+    rects_fantasmas.append(pygame.Rect(start_x * 20, start_y * 20, 20, 20))
+    ghost_spawn.remove((start_x, start_y))
+    
+
+if 'blinky' in nombres_fantasmas: # informacion de blinky para la logica de chase de inky
+    index = nombres_fantasmas.index('blinky')
+else:
+    index = random.randint(0, 3)
+    
+blinky_pos = posiciones_fantasmas[index]
+
+# definicion de variables --------------------------------------------------------------------------------------
 fantasmas_activados = 0
+puntaje_final = 0
 
 puntaje = 0
 vidas = 3
@@ -144,7 +156,7 @@ inicio_fases = 0
 cantidad_fantasmas_comidos = 0
 puntaje_por_fantasmas_comidos = [0, 200, 400, 800, 1600]
 
-# loop del juego
+# loop del juego --------------------------------------------------------------------------------------
 while playing:
     # si se superan los 10000 puntos, se otorga una vida extra una unica vez
     if puntaje >= 10000 and not vida_extra_otorgada:
@@ -153,21 +165,21 @@ while playing:
     segundos = pygame.time.get_ticks()/1000 #tiempo de juego
     text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white) # actualizacion puntaje
         
+    # activacion de los fantasmas (salen en orden) --------------------------------------------------------------------------------------
     if fantasmas_activados < 1:
         fantasmas[0].modo = 'salir_de_casa'
         fantasmas_activados += 1
-    elif puntaje >= 30 and fantasmas_activados < 2:
+    elif (puntaje - puntaje_final) >= 30 and fantasmas_activados < 2:
         fantasmas[1].modo = 'salir_de_casa'
         fantasmas_activados += 1
-    elif puntaje >= 60 and fantasmas_activados < 3:
+    elif (puntaje - puntaje_final) >= 60 and fantasmas_activados < 3:
         fantasmas[2].modo = 'salir_de_casa'
         fantasmas_activados += 1
-    elif puntaje >= 90 and fantasmas_activados < 4:
+    elif (puntaje - puntaje_final) >= 90 and fantasmas_activados < 4:
         fantasmas[3].modo = 'salir_de_casa'
         fantasmas_activados += 1
-
         
-    # chequeo de puntos ----------------------------------------------------------------
+    # LEVEL UP (revisa cada 3 segundos) ----------------------------------------------------------------
     if segundos - ultimo_chequeo_puntos >= 3:
         hay_puntos = False
         for item in dic_mapa.values():
@@ -181,63 +193,87 @@ while playing:
             dic_mapa = mapa('mapa.txt', graficos)
             jugador.posx = pac_x_inic * 20
             jugador.posy = pac_y_inic * 20
+            inicio_fases = segundos
+            modo_fantasmas_global = 'scatter'
+            tiempo_pausado = 0
+            fantasmas_activados = 0
+            puntaje_final = puntaje
+            
+            for ghost in fantasmas:
+                ghost.posx = ghost.spawn[0] * 20
+                ghost.posy = ghost.spawn[1] * 20
+                ghost.modo = None
+
                 
         ultimo_chequeo_puntos = segundos
  
-    pantalla.fill((0, 0, 0))
+    pantalla.fill((0, 0, 0)) # elimina los sprites del frame anterior
         
-    # Renderizado del mapa -----------------------------------------------------------------------------------
+    # Renderizado del mapa y logica PacMan -----------------------------------------------------------------------------------
     renderizado(pantalla, dic_mapa, graficos)
     dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje)
          
     # efecto de los powerpellets ------------------------------------------------------------------
     if comio_powerpellet:
-        if fantasmas_scared:
+        if fantasmas_scared: # si comio un powerpellet durante el efecto de otro
             tiempo_pausado += segundos - ultimo_powerpellet_comido # ataja el ocasional caso de que un powerpellet sea comido durante el efecto de otro
-        jugador.velocidad = porcentaje_velocidad(90)
-        ultimo_powerpellet_comido = segundos
+        
+        jugador.velocidad = porcentaje_velocidad(90) # pacman aumenta la velocidad
+        ultimo_powerpellet_comido = segundos # establece el timer
+        
         fantasmas_scared = True
+        
         for ghost in fantasmas:
-            if ghost.modo not in ['salir_de_casa', 'volver_a_casa']:
+            if ghost.modo not in ['salir_de_casa', 'volver_a_casa']: # en caso de que esten muertos o en el ghost house, su modo no se altera
                 ghost.cambio_de_modo('scared')
                 ghost.velocidad = porcentaje_velocidad(50)
                 
-    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 4:
+    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 4: # comienzan a parpadear a los 4 segundos 
         parpadeo_scared = True       
     
-    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 6:
+    # fin del efecto del powerpellet --------------------------------------------------------------------------------------
+    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 6: 
         parpadeo_scared = False
-        jugador.velocidad = porcentaje_velocidad(80)
+        jugador.velocidad = porcentaje_velocidad(80) # pacman vuelve a su velocidad normal
+        
         fantasmas_scared = False
-        cantidad_fantasmas_comidos = 0
-        tiempo_pausado += segundos - ultimo_powerpellet_comido
+        cantidad_fantasmas_comidos = 0 # se reinicia el multiplicador
+        tiempo_pausado += segundos - ultimo_powerpellet_comido # agrega el tiempo que el reloj estuvo pausado para las fases globales
+        
         for ghost in fantasmas:
             if ghost.modo == 'scared':
                 ghost.cambio_de_modo(modo_fantasmas_global)
                 ghost.velocidad = porcentaje_velocidad(75)
  
+    # manejo de los modos globales --------------------------------------------------------------------------------------
     if not fantasmas_scared:
         tiempo_de_fase = segundos - inicio_fases - tiempo_pausado
         nuevo_modo = fase_actual(tiempo_de_fase)
-        if nuevo_modo != modo_fantasmas_global:
+        
+        if nuevo_modo != modo_fantasmas_global: # cambio de modo global
             modo_fantasmas_global = nuevo_modo
+            
             for ghost in fantasmas:
                 if ghost.modo in ('scatter', 'chase'):
                     ghost.cambio_de_modo(modo_fantasmas_global)
 
-    info_bots = (jugador.casilla, jugador.direccion)        
+    info_bots = (jugador.casilla, jugador.direccion)
     
+    # logica de los fantasmas --------------------------------------------------------------------------------------
     for f, rect in zip(fantasmas, rects_fantasmas):
-        if f.modo in ['chase', 'scatter', 'salir_de_casa', None]:
+        
+        if f.modo in ['chase', 'scatter', 'salir_de_casa', None]: #sprite normal
             imagen = rotar_grafico_fantasma(f, graficos[f.nombre])
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
-        elif f.modo == 'scared':
-            if not parpadeo_scared:
+       
+        elif f.modo == 'scared': 
+            if not parpadeo_scared: # sprite 'scared'
                 imagen = rotar_grafico_fantasma(f, graficos['scared'])
-            else:
+            else: # si faltan 2 segundos o menos para que termine el efecto del parpadeo
                 imagen = rotar_grafico_fantasma(f, graficos['scared']) if ((segundos // 0.5) % 2 == 0) else rotar_grafico_fantasma(f, graficos['parpadeo_scared'])
             
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
+        
         else:
             imagen = rotar_grafico_fantasma(f, graficos['volver_a_casa'])
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
@@ -245,15 +281,13 @@ while playing:
             
         rect.topleft = (f.posx, f.posy)
     
-    pantalla.blit(text_surface, (100, 620))
+    # renderizado de PacMan -----------------------------------------------------------------------------
+    pantalla.blit(text_surface, (100, 620)) # puntaje y vidas
 
     abnierto, cerrado = rotar_imagen_jugador(jugador)
     
     fase = (segundos // salto) % 2
-    if fase == 0 :
-        pantalla.blit(abnierto, (jugador.posx, jugador.posy))
-    else:
-        pantalla.blit(cerrado, (jugador.posx, jugador.posy))
+    pantalla.blit(abnierto, (jugador.posx, jugador.posy)) if fase == 0 else pantalla.blit(cerrado, (jugador.posx, jugador.posy))     
     
     pacman_rect.topleft = (jugador.posx, jugador.posy)
 
@@ -275,12 +309,8 @@ while playing:
                 tiempo_pausado = 0
                 
                 vidas -= 1
-                for numero, casilla in dic_mapa.items():
-                    if casilla == 'inicio':
-                        x_inicial, y_inicial = numero
-                        jugador.posx = x_inicial * 20
-                        jugador.posy = y_inicial * 20
-                        break
+                jugador.posx = pac_x_inic * 20
+                jugador.posy = pac_y_inic * 20
                     
                 for ghost in fantasmas:
                     ghost.posx = ghost.spawn[0] * 20
