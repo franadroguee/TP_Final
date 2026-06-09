@@ -38,7 +38,8 @@ graficos = {
     'blinky': pygame.image.load(os.path.join(carpeta_graficos, 'blinky.png')),
     'inky': pygame.image.load(os.path.join(carpeta_graficos, 'inky.png')),
     'clyde': pygame.image.load(os.path.join(carpeta_graficos, 'clyde.png')), 
-    'pinky': pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png')), 
+    'pinky': pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png')),
+    'parpadeo_scared': pygame.image.load(os.path.join(carpeta_graficos, 'parpadeo_scared.png')),
     'scared': pygame.image.load(os.path.join(carpeta_graficos, 'scared_ghost.png')),
     'volver_a_casa': pygame.image.load(os.path.join(carpeta_graficos, 'volver_a_casa.png'))
     }
@@ -134,6 +135,7 @@ ultimo_chequeo_puntos = 0
 
 ultimo_powerpellet_comido = 0
 fantasmas_scared = False
+parpadeo_scared = False
 
 modo_fantasmas_global = 'scatter'
 tiempo_pausado = 0
@@ -199,8 +201,12 @@ while playing:
             if ghost.modo not in ['salir_de_casa', 'volver_a_casa']:
                 ghost.cambio_de_modo('scared')
                 ghost.velocidad = porcentaje_velocidad(50)
-            
-    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 5:
+                
+    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 4:
+        parpadeo_scared = True       
+    
+    if fantasmas_scared and segundos - ultimo_powerpellet_comido > 6:
+        parpadeo_scared = False
         jugador.velocidad = porcentaje_velocidad(80)
         fantasmas_scared = False
         cantidad_fantasmas_comidos = 0
@@ -226,7 +232,11 @@ while playing:
             imagen = rotar_grafico_fantasma(f, graficos[f.nombre])
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         elif f.modo == 'scared':
-            imagen = rotar_grafico_fantasma(f, graficos['scared'])
+            if not parpadeo_scared:
+                imagen = rotar_grafico_fantasma(f, graficos['scared'])
+            else:
+                imagen = rotar_grafico_fantasma(f, graficos['scared']) if ((segundos // 0.5) % 2 == 0) else rotar_grafico_fantasma(f, graficos['parpadeo_scared'])
+            
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         else:
             imagen = rotar_grafico_fantasma(f, graficos['volver_a_casa'])
