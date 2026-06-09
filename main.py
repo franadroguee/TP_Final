@@ -113,6 +113,7 @@ def rotar_imagen_jugador(jugador):
 
 salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 
+fantasmas_activados = 0
 
 puntaje = 0
 vidas = 3
@@ -137,6 +138,20 @@ while playing:
     
     segundos = pygame.time.get_ticks()/1000 #tiempo de juego
     text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white) # actualizacion puntaje
+        
+    if fantasmas_activados < 1:
+        fantasmas[0].modo = 'salir_de_casa'
+        fantasmas_activados += 1
+    elif puntaje >= 30 and fantasmas_activados < 2:
+        fantasmas[1].modo = 'salir_de_casa'
+        fantasmas_activados += 1
+    elif puntaje >= 60 and fantasmas_activados < 3:
+        fantasmas[2].modo = 'salir_de_casa'
+        fantasmas_activados += 1
+    elif puntaje >= 90 and fantasmas_activados < 4:
+        fantasmas[3].modo = 'salir_de_casa'
+        fantasmas_activados += 1
+
         
     # chequeo de puntos ----------------------------------------------------------------
     if segundos - ultimo_chequeo_puntos >= 3:
@@ -195,12 +210,13 @@ while playing:
     info_bots = (jugador.casilla, jugador.direccion)        
     
     for f, rect in zip(fantasmas, rects_fantasmas):
-        if f.modo in ['chase', 'scatter', 'salir_de_casa']:
+        if f.modo in ['chase', 'scatter', 'salir_de_casa', None]:
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, graficos[f.nombre], pantalla, blinky_pos)
         elif f.modo == 'scared':
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, graficos['scared'], pantalla, blinky_pos)
         else:
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, graficos['volver_a_casa'], pantalla, blinky_pos)
+        
             
         rect.topleft = (f.posx, f.posy)
     

@@ -235,11 +235,15 @@ class fantasma(personaje):
     def __init__(self, posx, posy, velocidad, nombre, spawn: tuple, esquina: tuple):
         super().__init__(posx, posy, velocidad)
         self.nombre = nombre
-        self.modo = 'salir_de_casa' # scatter, chase, scare
+        self.modo = None # scatter, chase, scare
         self.spawn = spawn
         self.esquina = esquina
 
     def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, blinky_pos: tuple) -> None:
+        if self.modo == None:
+            pantalla.blit(grafico, (self.posx, self.posy))
+            return None
+        
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
             
