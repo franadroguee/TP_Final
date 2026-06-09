@@ -105,11 +105,23 @@ def rotar_imagen_jugador(jugador):
         'right': lambda imagen: pygame.transform.rotate(imagen, 0),
         'left':  lambda imagen: pygame.transform.flip(imagen, True, False),
         'up':    lambda imagen: pygame.transform.rotate(imagen, 90),
-        'down':  lambda imagen: pygame.transform.rotate(imagen, 270),
+        'down':  lambda imagen: pygame.transform.rotate(imagen, 270)
     }
     
     t = transformaciones[jugador.direccion]
-    return t(superficie_jugador), t(superficie_jugador_cerrado)        
+    return t(superficie_jugador), t(superficie_jugador_cerrado)     
+
+def rotar_grafico_fantasma(fantasma, imagen):
+    transformaciones = {
+        'right': lambda imagen: pygame.transform.flip(imagen, True, False),
+        'left':  lambda imagen: pygame.transform.rotate(imagen, 0),
+        'up':    lambda imagen: imagen,
+        'down':  lambda imagen: imagen
+    }
+    
+    t = transformaciones[fantasma.direccion]
+    return t(imagen)        
+   
 
 salto = 0.2 # cada {salto} segundos, abre/ cierra la boca
 
@@ -211,11 +223,14 @@ while playing:
     
     for f, rect in zip(fantasmas, rects_fantasmas):
         if f.modo in ['chase', 'scatter', 'salir_de_casa', None]:
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, graficos[f.nombre], pantalla, blinky_pos)
+            imagen = rotar_grafico_fantasma(f, graficos[f.nombre])
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         elif f.modo == 'scared':
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, graficos['scared'], pantalla, blinky_pos)
+            imagen = rotar_grafico_fantasma(f, graficos['scared'])
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         else:
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, graficos['volver_a_casa'], pantalla, blinky_pos)
+            imagen = rotar_grafico_fantasma(f, graficos['volver_a_casa'])
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         
             
         rect.topleft = (f.posx, f.posy)
