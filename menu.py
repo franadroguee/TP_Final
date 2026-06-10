@@ -211,9 +211,10 @@ def menu_posiciones(pantalla, fantasmas_seleccionados):
                             return
 
 
-seguir = pantalla_inicio(pantalla)
-if seguir:
-    fantasmas_seleccionados = menu_fantasmas(pantalla, fantasmas)
-    print(fantasmas_seleccionados)
-    print(menu_posiciones(pantalla, fantasmas_seleccionados))
-pygame.quit()
+def start():
+    seguir = pantalla_inicio(pantalla)
+    if seguir:
+        fantasmas_seleccionados = menu_fantasmas(pantalla, fantasmas)
+        return menu_posiciones(pantalla, fantasmas_seleccionados)
+    pygame.quit()
+print(start())

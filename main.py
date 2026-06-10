@@ -3,7 +3,7 @@ import os
 from mapa import mapa, renderizado
 from personajes import pacman, fantasma
 import random
-from menu import 
+from menu import start
 
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
