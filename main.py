@@ -3,6 +3,7 @@ import os
 from mapa import mapa, renderizado
 from personajes import pacman, fantasma
 import random
+from menu import 
 
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
@@ -37,17 +38,16 @@ def fase_actual(tiempo):
 # sprites ---------------------------------------------------------------------------------------
 graficos_mapa = {
     'pared': pygame.image.load(os.path.join('Sprites', 'pared.png')),
-    'pasillo': pygame.image.load(os.path.join('Sprites', 'pasillo.png')),
     'power': pygame.image.load(os.path.join('Sprites', 'powerpellet.png')),
     'puerta': pygame.image.load(os.path.join('Sprites', 'puerta.png')),
     'punto': pygame.image.load(os.path.join('Sprites', 'punto.png')),
     }
 
 # Sprites --------------------------------------------------------------------------------------------
-
-fase_sprites = 'carpeta1'
-
 def sprite_fantasma(fantasma, fase_sprites):
+    if fantasma.modo == 'volver_a_casa':
+        archivo = f'volver_a_casa_{fantasma.direccion}.png'
+        return pygame.image.load(os.path.join('Sprites', archivo))
     nombre = fantasma.nombre
     direccion = fantasma.direccion
     
@@ -61,7 +61,8 @@ def sprite_pacman(jugador, fase_sprites):
         'right': lambda imagen: pygame.transform.rotate(imagen, 0),
         'left':  lambda imagen: pygame.transform.flip(imagen, True, False),
         'up':    lambda imagen: pygame.transform.rotate(imagen, 90),
-        'down':  lambda imagen: pygame.transform.rotate(imagen, 270)
+        'down':  lambda imagen: pygame.transform.rotate(imagen, 270),
+        None: lambda imagen: pygame.transform.rotate(imagen, 0)
     }
     
     t = transformaciones[jugador.direccion]
@@ -205,6 +206,7 @@ while playing:
     if comio_powerpellet:
         if fantasmas_scared: # si comio un powerpellet durante el efecto de otro
             tiempo_pausado += segundos - ultimo_powerpellet_comido # ataja el ocasional caso de que un powerpellet sea comido durante el efecto de otro
+            parpadeo_scared = False
         
         jugador.velocidad = porcentaje_velocidad(90) # pacman aumenta la velocidad
         ultimo_powerpellet_comido = segundos # establece el timer
@@ -250,7 +252,6 @@ while playing:
     # Fases de los Sprites ----------------------------------------------------------
     fase = (segundos // salto) % 2
     fase_sprites = 'fase1' if fase == 0 else 'fase2'
-
     
     # logica de los fantasmas --------------------------------------------------------------------------------------
     for f, rect in zip(fantasmas, rects_fantasmas):
@@ -261,14 +262,14 @@ while playing:
        
         elif f.modo == 'scared': 
             if not parpadeo_scared: # sprite 'scared'
-                imagen = pygame.image.load(os.path.join('Sprites', 'scared_ghost.png'))
+                imagen = pygame.image.load(os.path.join('Sprites', fase_sprites, 'scared.png'))
             else: # si faltan 2 segundos o menos para que termine el efecto del parpadeo
-                imagen = pygame.image.load(os.path.join('Spriets', 'scared_ghost.png')) if ((segundos // 0.5) % 2 == 0) else pygame.image.load(os.path.join('graficos', 'parpadeo_scared.png'))
+                imagen = pygame.image.load(os.path.join('Sprites', fase_sprites, 'scared.png')) if ((segundos // 0.5) % 2 == 0) else pygame.image.load(os.path.join('Sprites', fase_sprites, 'parpadeo_scared.png'))
             
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         
         else:
-            imagen = pygame.image.load(os.path.join('Sprites', 'volver_a_casa.png'))
+            imagen = sprite_fantasma(f, fase_sprites)
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         
             
@@ -301,6 +302,8 @@ while playing:
                 vidas -= 1
                 jugador.posx = pac_x_inic * 20
                 jugador.posy = pac_y_inic * 20
+                jugador.direccion = None
+                jugador.direccion_deseada = None
                     
                 for ghost in fantasmas:
                     ghost.posx = ghost.spawn[0] * 20

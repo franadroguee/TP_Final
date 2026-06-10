@@ -125,6 +125,8 @@ class personaje:
 class pacman(personaje):
     def __init__(self, posx, posy, velocidad) -> None:
         super().__init__(posx, posy, velocidad)
+        self.direccion = None
+        self.direccion_deseada = None
         
     def puede_cambiar_direccion(self, mapa: dict) -> bool:
         """
@@ -217,6 +219,9 @@ class pacman(personaje):
         Se ejecuta todos los frames. Procesa todas las acciones del personaje (movimiento, comestibles, etc.). Devuelve el diccionario con el mapa actualizado y el nuevo puntaje del jugador
         """
         comio_powerpellet = False
+        if self.direccion == None and self.direccion_deseada == None:
+            return mapa, puntaje, comio_powerpellet
+        
         if self.direccion_deseada != self.direccion and self.puede_cambiar_direccion(mapa):
             # si pacman desea ir en una direccion distinta a la que esta yendo y esta centrado
             self.cambio_direccion()
