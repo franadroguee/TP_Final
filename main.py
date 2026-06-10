@@ -7,7 +7,6 @@ import random
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
-carpeta_graficos = 'graficos'
 
 # modos globales --------------------------------------------------------------------------------------
 fases = [
@@ -36,27 +35,28 @@ def fase_actual(tiempo):
             tiempo -= duracion_modo # si no, se le resta el tiempo de ese modo y se intenta denuevo
 
 # sprites ---------------------------------------------------------------------------------------
-graficos = {
-    'pared': pygame.image.load(os.path.join(carpeta_graficos, 'pared.png')),
-    'pasillo': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
-    'power': pygame.image.load(os.path.join(carpeta_graficos, 'powerpellet.png')),
-    'puerta': pygame.image.load(os.path.join(carpeta_graficos, 'puerta.png')),
-    'punto': pygame.image.load(os.path.join(carpeta_graficos, 'punto.png')),
-    'tunel': pygame.image.load(os.path.join(carpeta_graficos, 'pasillo.png')),
-    'blinky': pygame.image.load(os.path.join(carpeta_graficos, 'blinky.png')),
-    'inky': pygame.image.load(os.path.join(carpeta_graficos, 'inky.png')),
-    'clyde': pygame.image.load(os.path.join(carpeta_graficos, 'clyde.png')), 
-    'pinky': pygame.image.load(os.path.join(carpeta_graficos, 'pinky.png')),
-    'parpadeo_scared': pygame.image.load(os.path.join(carpeta_graficos, 'parpadeo_scared.png')),
-    'scared': pygame.image.load(os.path.join(carpeta_graficos, 'scared_ghost.png')),
-    'volver_a_casa': pygame.image.load(os.path.join(carpeta_graficos, 'volver_a_casa.png'))
+graficos_mapa = {
+    'pared': pygame.image.load(os.path.join('Sprites', 'pared.png')),
+    'pasillo': pygame.image.load(os.path.join('Sprites', 'pasillo.png')),
+    'power': pygame.image.load(os.path.join('Sprites', 'powerpellet.png')),
+    'puerta': pygame.image.load(os.path.join('Sprites', 'puerta.png')),
+    'punto': pygame.image.load(os.path.join('Sprites', 'punto.png')),
     }
 
-superficie_jugador = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man.png'))
-superficie_jugador_cerrado = pygame.image.load(os.path.join(carpeta_graficos, 'Pac_Man_Cerrado.png'))
+# Sprites --------------------------------------------------------------------------------------------
 
-# manejo de los sprites ----------------------------------------------------------------
-def rotar_imagen_jugador(jugador):
+fase_sprites = 'carpeta1'
+
+def sprite_fantasma(fantasma, fase_sprites):
+    nombre = fantasma.nombre
+    direccion = fantasma.direccion
+    
+    archivo = f'{nombre}_{direccion}.png'
+    return pygame.image.load(os.path.join('Sprites', fase_sprites, archivo))
+
+def sprite_pacman(jugador, fase_sprites):
+    imagen = pygame.image.load(os.path.join('Sprites', fase_sprites, 'Pac_Man.png'))
+    
     transformaciones = {
         'right': lambda imagen: pygame.transform.rotate(imagen, 0),
         'left':  lambda imagen: pygame.transform.flip(imagen, True, False),
@@ -65,21 +65,9 @@ def rotar_imagen_jugador(jugador):
     }
     
     t = transformaciones[jugador.direccion]
-    return t(superficie_jugador), t(superficie_jugador_cerrado)     
+    return t(imagen)       
 
-def rotar_grafico_fantasma(fantasma, imagen):
-    transformaciones = {
-        'right': lambda imagen: pygame.transform.flip(imagen, True, False),
-        'left':  lambda imagen: pygame.transform.rotate(imagen, 0),
-        'up':    lambda imagen: imagen,
-        'down':  lambda imagen: imagen
-    }
-    
-    t = transformaciones[fantasma.direccion]
-    return t(imagen)        
-   
-
-salto = 0.2 # cada {salto} segundos, PacMan abre/ cierra la boca
+salto = 0.2 # cada {salto} se mueven las aletas de los fantasmas y PacMan abre/cierra la boca
 
 game_font = pygame.font.Font(None, 50)
 white = (255, 255, 255)
@@ -87,7 +75,7 @@ white = (255, 255, 255)
 # inicio de la logica del juego ------------------------------------------------------------------
 playing = True
 clock = pygame.time.Clock()
-dic_mapa = mapa('mapa.txt', graficos)  
+dic_mapa = mapa('mapa.txt', graficos_mapa)  
 ghost_spawn = []
 ghost_places = []
 
@@ -190,7 +178,7 @@ while playing:
         if hay_puntos:
             pass
         else:
-            dic_mapa = mapa('mapa.txt', graficos)
+            dic_mapa = mapa('mapa.txt', graficos_mapa)
             jugador.posx = pac_x_inic * 20
             jugador.posy = pac_y_inic * 20
             inicio_fases = segundos
@@ -210,7 +198,7 @@ while playing:
     pantalla.fill((0, 0, 0)) # elimina los sprites del frame anterior
         
     # Renderizado del mapa y logica PacMan -----------------------------------------------------------------------------------
-    renderizado(pantalla, dic_mapa, graficos)
+    renderizado(pantalla, dic_mapa, graficos_mapa)
     dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje)
          
     # efecto de los powerpellets ------------------------------------------------------------------
@@ -259,23 +247,28 @@ while playing:
 
     info_bots = (jugador.casilla, jugador.direccion)
     
+    # Fases de los Sprites ----------------------------------------------------------
+    fase = (segundos // salto) % 2
+    fase_sprites = 'fase1' if fase == 0 else 'fase2'
+
+    
     # logica de los fantasmas --------------------------------------------------------------------------------------
     for f, rect in zip(fantasmas, rects_fantasmas):
         
         if f.modo in ['chase', 'scatter', 'salir_de_casa', None]: #sprite normal
-            imagen = rotar_grafico_fantasma(f, graficos[f.nombre])
+            imagen = sprite_fantasma(f, fase_sprites)
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
        
         elif f.modo == 'scared': 
             if not parpadeo_scared: # sprite 'scared'
-                imagen = rotar_grafico_fantasma(f, graficos['scared'])
+                imagen = pygame.image.load(os.path.join('Sprites', 'scared_ghost.png'))
             else: # si faltan 2 segundos o menos para que termine el efecto del parpadeo
-                imagen = rotar_grafico_fantasma(f, graficos['scared']) if ((segundos // 0.5) % 2 == 0) else rotar_grafico_fantasma(f, graficos['parpadeo_scared'])
+                imagen = pygame.image.load(os.path.join('Spriets', 'scared_ghost.png')) if ((segundos // 0.5) % 2 == 0) else pygame.image.load(os.path.join('graficos', 'parpadeo_scared.png'))
             
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         
         else:
-            imagen = rotar_grafico_fantasma(f, graficos['volver_a_casa'])
+            imagen = pygame.image.load(os.path.join('Sprites', 'volver_a_casa.png'))
             f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
         
             
@@ -283,11 +276,8 @@ while playing:
     
     # renderizado de PacMan -----------------------------------------------------------------------------
     pantalla.blit(text_surface, (100, 620)) # puntaje y vidas
-
-    abnierto, cerrado = rotar_imagen_jugador(jugador)
     
-    fase = (segundos // salto) % 2
-    pantalla.blit(abnierto, (jugador.posx, jugador.posy)) if fase == 0 else pantalla.blit(cerrado, (jugador.posx, jugador.posy))     
+    pantalla.blit(sprite_pacman(jugador, fase_sprites), (jugador.posx, jugador.posy))
     
     pacman_rect.topleft = (jugador.posx, jugador.posy)
 

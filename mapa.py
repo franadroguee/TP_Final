@@ -65,17 +65,17 @@ def renderizado(pantalla, dic_mapa: dict, graficos: dict) -> None:
         elif celda == 'punto': # punto
             pantalla.blit(graficos['punto'], (numero))
         elif celda == 'pasillo': # pasillo
-            pantalla.blit(graficos['pasillo'], (numero))
+            pass
         elif celda == 'ghost': # Ghost house
-            pantalla.blit(graficos['pasillo'], (numero))
+            pass
         elif celda == 'power': # PowerPellet
             pantalla.blit(graficos['power'], (numero))
         elif celda == 'puerta': # puerta ghost house
             pantalla.blit(graficos['puerta'], (numero))
         elif celda == 'tunel': # tunel lateral
-            pantalla.blit(graficos['tunel'], (numero))
+            pass
         elif celda == 'inicio':
-            pantalla.blit(graficos['pasillo'], (numero))
+            pass
             
 
 
