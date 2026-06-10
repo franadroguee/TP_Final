@@ -151,13 +151,15 @@ inicio_fases = 0
 cantidad_fantasmas_comidos = 0
 puntaje_por_fantasmas_comidos = [0, 200, 400, 800, 1600]
 
+tiempo_en_menu = pygame.time.get_ticks()/1000
 # loop del juego --------------------------------------------------------------------------------------
 while playing:
     # si se superan los 10000 puntos, se otorga una vida extra una unica vez
     if puntaje >= 10000 and not vida_extra_otorgada:
         vidas += 1
+        vida_extra_otorgada = True
     
-    segundos = pygame.time.get_ticks()/1000 #tiempo de juego
+    segundos = (pygame.time.get_ticks()/1000) - tiempo_en_menu #tiempo de juego
     text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white) # actualizacion puntaje
         
     # activacion de los fantasmas (salen en orden) --------------------------------------------------------------------------------------
@@ -308,8 +310,6 @@ while playing:
                 vidas -= 1
                 jugador.posx = pac_x_inic * 20
                 jugador.posy = pac_y_inic * 20
-                jugador.direccion = None
-                jugador.direccion_deseada = None
                     
                 for ghost in fantasmas:
                     ghost.posx = ghost.spawn[0] * 20

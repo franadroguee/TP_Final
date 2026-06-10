@@ -125,8 +125,6 @@ class personaje:
 class pacman(personaje):
     def __init__(self, posx, posy, velocidad) -> None:
         super().__init__(posx, posy, velocidad)
-        self.direccion = None
-        self.direccion_deseada = None
         
     def puede_cambiar_direccion(self, mapa: dict) -> bool:
         """
