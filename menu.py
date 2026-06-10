@@ -217,4 +217,3 @@ def start():
         fantasmas_seleccionados = menu_fantasmas(pantalla, fantasmas)
         return menu_posiciones(pantalla, fantasmas_seleccionados)
     pygame.quit()
-print(start())

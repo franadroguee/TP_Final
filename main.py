@@ -5,6 +5,8 @@ from personajes import pacman, fantasma
 import random
 from menu import start
 
+fantasmas_y_esquinas = start()
+
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
 pantalla = pygame.display.set_mode((560, 775))
@@ -102,8 +104,12 @@ pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
 vida_extra_otorgada = False
 
 # inicializacion de los fantasmas ------------------------------------------------------------
-nombres_fantasmas = ['pinky', 'blinky', 'clyde', 'inky']
-esquinas_fantasmas = [(0, 0), (28, 0), (0, 31), (28, 31)]
+nombres_fantasmas = []
+esquinas_fantasmas = []
+for nombre, esquina in fantasmas_y_esquinas.items():
+    nombres_fantasmas.append(nombre)
+    esquinas_fantasmas.append(esquina)
+
 fantasmas = []
 rects_fantasmas = []
 posiciones_fantasmas = []
