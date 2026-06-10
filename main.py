@@ -107,7 +107,7 @@ vida_extra_otorgada = False
 nombres_fantasmas = []
 esquinas_fantasmas = []
 for nombre, esquina in fantasmas_y_esquinas.items():
-    nombres_fantasmas.append(nombre)
+    nombres_fantasmas.append(nombre.lower())
     esquinas_fantasmas.append(esquina)
 
 fantasmas = []
