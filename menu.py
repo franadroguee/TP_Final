@@ -29,7 +29,7 @@ datos = [
     ("Pinky",  "rosa",    "El emboscador"),
     ("Inky",   "celeste", "El flanqueador"),
     ("Clyde",  "naranja", "El tímido"),
-    ("Spike",  "verde",   "El interceptor"),
+    ("Sleepy",  "gris",   "El dormido"),
     ("Coward", "violeta", "El cobarde"),
 ]
 
@@ -41,7 +41,7 @@ COLORES_RGB = {
     "rosa":    (255, 105, 180),
     "celeste": (0, 200, 255),
     "naranja": (255, 140, 0),
-    "verde":   (0, 200, 0),
+    "gris":    (128, 128, 128),
     "violeta": (160, 32, 240),
 }
 

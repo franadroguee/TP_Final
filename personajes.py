@@ -33,7 +33,7 @@ class personaje:
         self.velocidad = velocidad
         self.casilla = (posx/20, posy/20) # se actualiza cuando el personaje esta centrado
     
-    def movimeinto(self) -> None:
+    def movimiento(self) -> None:
         """
         Altera self.posx, self.posy en funcion de la direccion del personaje. Si esta por salirse de una casilla, antes de hacerlo, se centra en la misma.
         """
@@ -225,7 +225,7 @@ class pacman(personaje):
             self.cambio_direccion()
             
         if self.debe_moverse(mapa):
-            self.movimeinto()
+            self.movimiento()
             
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
@@ -242,7 +242,11 @@ class fantasma(personaje):
         self.spawn = spawn
         self.esquina = esquina
 
-    def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, blinky_pos: tuple) -> None:
+        self.sleepy_despierto = False
+        self.tiempo_inicio_modo = 0
+        self.modo_anterior = None
+
+    def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, blinky_pos: tuple, segundos: float) -> None:
         "A ejecutarse todos los frames. Revisa, primero si "
         if self.modo == None:
             pantalla.blit(grafico, (self.posx, self.posy))
@@ -251,12 +255,20 @@ class fantasma(personaje):
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
             
-        if self.casilla not in ghost_places and self.modo == 'salir_de_casa':
-            self.modo = 'scatter'
+        if self.casilla not in ghost_places and self.modo == "salir_de_casa":
+            if self.nombre == "sleepy":
+                self.modo = "sleepy_scatter"
+                self.tiempo_inicio_modo = segundos
+            else:
+                self.modo = "scatter"
                                                  
         if self.posicion_perfecta():
             self.chequeo_tunel(mapa)
-            if self.modo == 'scatter':
+
+            if self.nombre == "sleepy" and self.modo in ["sleepy_scatter", "sleep", "sleepy_chase"]:
+                self.comportamiento_sleepy(mapa, info_bots, segundos)
+
+            elif self.modo == 'scatter':
                 self.direccion = self.scatter(self.esquina, mapa)
                 
             elif self.modo == 'salir_de_casa':   
@@ -282,11 +294,16 @@ class fantasma(personaje):
                 
             else:
                 pos_pacman = info_bots[0]
-                self.direccion = self.scared(pos_pacman, mapa)            
-                        
-        if self.debe_moverse(mapa):
-            self.movimeinto()
-            
+                self.direccion = self.scared(pos_pacman, mapa)    
+
+
+        if self.modo !="sleep":          #asi no se mueve si esta dormido
+            if self.debe_moverse(mapa):
+                self.movimiento()
+
+        
+
+
         pantalla.blit(grafico, (self.posx, self.posy))
         
     def debe_moverse(self, mapa:dict) -> bool:
@@ -440,7 +457,57 @@ class fantasma(personaje):
                 dist_min = dist
                 
         return dir_min
+    
+  
+    def pacmancerca3x3(self, pos_pacman):
+        """
+        si pacman se encuentra en un perimetro de 3x3, el fantasma se despierta y empieza a perseguirlo
+        """
+        ghost_x, ghost_y = self.casilla
+        pac_x, pac_y = pos_pacman
 
+        diferencia_x = abs(ghost_x - pac_x)
+        diferencia_y = abs(ghost_y - pac_y)
+
+        return diferencia_x <= 1 and diferencia_y <= 1
+  
+    def pacamanvisto(self, pos_pacman):
+        """
+        si pacman concide con la columna o fila de sleepy, se depierta y empieza a perseguirlo
+        """
+        ghost_x, ghost_y = self.casilla
+        pac_x, pac_y = pos_pacman
+
+        misma_fila = ghost_y == pac_y
+        misma_columna = ghost_x == pac_x
+
+        return misma_fila or misma_columna
+    
+def comportamiento_sleepy(self, mapa, info_bots, segundos):
+    pos_pacman = info_bots[0]
+
+    if self.pacmancerca3x3(pos_pacman) and self.pacamanvisto(pos_pacman):
+        self.sleepy_despierto = True
+        self.modo = "sleepy_chase"
+
+    if self.modo == "sleepy_chase":
+        self.direccion = self.dirigirse_a_casilla(pos_pacman, mapa)
+
+    elif self.modo == "sleepy_scatter":
+        self.direccion = self.scatter(self.esquina, mapa)
+
+        if segundos - self.tiempo_inicio_modo >= 5:
+            self.modo = "sleep"
+            self.tiempo_inicio_modo = segundos
+
+    elif self.modo == "sleep":
+        if segundos - self.tiempo_inicio_modo >= 15:
+            self.modo = "sleepy_scatter"
+            self.tiempo_inicio_modo = segundos
+
+
+
+    
     def cambio_de_modo(self, nuevo_modo: str) -> None:
         """
         Cambia el modo del fantasma al modo deseado (scatter, chase, scare). Al hacerlo, el fantasma invierte su direccion

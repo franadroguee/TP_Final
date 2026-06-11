@@ -266,7 +266,7 @@ while playing:
         
         if f.modo in ['chase', 'scatter', 'salir_de_casa', None]: #sprite normal
             imagen = sprite_fantasma(f, fase_sprites)
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos,segundos)
        
         elif f.modo == 'scared': 
             if not parpadeo_scared: # sprite 'scared'
@@ -274,11 +274,11 @@ while playing:
             else: # si faltan 2 segundos o menos para que termine el efecto del parpadeo
                 imagen = pygame.image.load(os.path.join('Sprites', fase_sprites, 'scared.png')) if ((segundos // 0.5) % 2 == 0) else pygame.image.load(os.path.join('Sprites', fase_sprites, 'parpadeo_scared.png'))
             
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos,segundos)
         
         else:
             imagen = sprite_fantasma(f, fase_sprites)
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos)
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos,segundos)
         
             
         rect.topleft = (f.posx, f.posy)
