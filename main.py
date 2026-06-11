@@ -5,11 +5,11 @@ from personajes import pacman, fantasma
 import random
 from menu import start
 
-fantasmas_y_esquinas = start()
-
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
-pantalla = pygame.display.set_mode((560, 775))
+pantalla = pygame.display.set_mode((560, 775), pygame.FULLSCREEN)
+
+fantasmas_y_esquinas = start()
 
 # modos globales --------------------------------------------------------------------------------------
 fases = [
