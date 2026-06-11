@@ -483,6 +483,18 @@ class fantasma(personaje):
 
         return misma_fila or misma_columna
     
+    
+    def cambio_de_modo(self, nuevo_modo: str) -> None:
+        """
+        Cambia el modo del fantasma al modo deseado (scatter, chase, scare). Al hacerlo, el fantasma invierte su direccion
+        """
+        if nuevo_modo != self.modo:
+            direcciones_opuestas = {'right': 'left', 'left': 'right', 'up': 'down', 'down': 'up'}
+            
+            direccion_opuesta = direcciones_opuestas[self.direccion]
+            self.direccion = direccion_opuesta
+            self.modo = nuevo_modo
+            
 def comportamiento_sleepy(self, mapa, info_bots, segundos):
     pos_pacman = info_bots[0]
 
@@ -506,15 +518,3 @@ def comportamiento_sleepy(self, mapa, info_bots, segundos):
             self.tiempo_inicio_modo = segundos
 
 
-
-    
-    def cambio_de_modo(self, nuevo_modo: str) -> None:
-        """
-        Cambia el modo del fantasma al modo deseado (scatter, chase, scare). Al hacerlo, el fantasma invierte su direccion
-        """
-        if nuevo_modo != self.modo:
-            direcciones_opuestas = {'right': 'left', 'left': 'right', 'up': 'down', 'down': 'up'}
-            
-            direccion_opuesta = direcciones_opuestas[self.direccion]
-            self.direccion = direccion_opuesta
-            self.modo = nuevo_modo
