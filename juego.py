@@ -25,7 +25,6 @@ def main():
 
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(-1)
-    waka_waka.play(-1)
 
     fantasmas_y_esquinas = start()
     ready()
@@ -239,7 +238,7 @@ def main():
 
         # Renderizado del mapa y logica PacMan -----------------------------------------------------------------------------------
         renderizado(pantalla, dic_mapa, graficos_mapa)
-        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, canal_waka)
+        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, waka_waka)
 
         # efecto de los powerpellets ------------------------------------------------------------------
         if comio_powerpellet:
