@@ -287,7 +287,12 @@ class fantasma(personaje):
             elif self.modo == 'volver_a_casa':
                 self.direccion = self.dirigirse_a_casilla((15,13), mapa)
                 if self.casilla == (15,13):
-                    self.cambio_de_modo('salir_de_casa')
+                    if self.nombre == "sleepy":
+                        self.resetear_sleepy(segundos)
+                        self.modo = "salir_de_casa"
+                    else:
+                        self.cambio_de_modo("salir_de_casa")
+
                     self.velocidad = velocidad_normal_fantasma
 
                     
@@ -471,17 +476,46 @@ class fantasma(personaje):
 
         return diferencia_x <= 1 and diferencia_y <= 1
   
-    def pacamanvisto(self, pos_pacman):
-        """
-        si pacman concide con la columna o fila de sleepy, se depierta y empieza a perseguirlo
-        """
+
+    def pacamanvisto(self, pos_pacman, mapa):
         ghost_x, ghost_y = self.casilla
         pac_x, pac_y = pos_pacman
+
+        ghost_x = int(ghost_x)
+        ghost_y = int(ghost_y)
+        pac_x = int(pac_x)
+        pac_y = int(pac_y)
 
         misma_fila = ghost_y == pac_y
         misma_columna = ghost_x == pac_x
 
-        return misma_fila or misma_columna
+        if not misma_fila and not misma_columna:
+            return False
+
+        rango_vista = 6
+
+        if abs(pac_x - ghost_x) > rango_vista or abs(pac_y - ghost_y) > rango_vista:
+            return False
+
+        if misma_fila:
+            paso_x = 1 if pac_x > ghost_x else -1
+            x = ghost_x + paso_x
+
+            while x != pac_x:
+                if mapa[(x, ghost_y)] == "pared" or mapa[(x, ghost_y)] == "puerta":
+                    return False
+                x += paso_x
+
+        if misma_columna:
+            paso_y = 1 if pac_y > ghost_y else -1
+            y = ghost_y + paso_y
+
+            while y != pac_y:
+                if mapa[(ghost_x, y)] == "pared" or mapa[(ghost_x, y)] == "puerta":
+                    return False
+                y += paso_y
+
+        return True
     
     
     def cambio_de_modo(self, nuevo_modo: str) -> None:
@@ -494,27 +528,36 @@ class fantasma(personaje):
             direccion_opuesta = direcciones_opuestas[self.direccion]
             self.direccion = direccion_opuesta
             self.modo = nuevo_modo
-            
-def comportamiento_sleepy(self, mapa, info_bots, segundos):
-    pos_pacman = info_bots[0]
 
-    if self.pacmancerca3x3(pos_pacman) and self.pacamanvisto(pos_pacman):
-        self.sleepy_despierto = True
-        self.modo = "sleepy_chase"
 
-    if self.modo == "sleepy_chase":
-        self.direccion = self.dirigirse_a_casilla(pos_pacman, mapa)
 
-    elif self.modo == "sleepy_scatter":
-        self.direccion = self.scatter(self.esquina, mapa)
-
-        if segundos - self.tiempo_inicio_modo >= 5:
-            self.modo = "sleep"
+    def resetear_sleepy(self, segundos):
+        if self.nombre == "sleepy":
+            self.sleepy_despierto = False
+            self.modo_anterior = None
             self.tiempo_inicio_modo = segundos
 
-    elif self.modo == "sleep":
-        if segundos - self.tiempo_inicio_modo >= 15:
-            self.modo = "sleepy_scatter"
-            self.tiempo_inicio_modo = segundos
+
+    def comportamiento_sleepy(self, mapa, info_bots, segundos):
+        pos_pacman = info_bots[0]
+
+        if self.pacmancerca3x3(pos_pacman) or self.pacamanvisto(pos_pacman, mapa):
+            self.sleepy_despierto = True
+            self.modo = "sleepy_chase"
+
+        if self.modo == "sleepy_chase":
+            self.direccion = self.dirigirse_a_casilla(pos_pacman, mapa)
+
+        elif self.modo == "sleepy_scatter":
+            self.direccion = self.scatter(self.esquina, mapa)
+
+            if segundos - self.tiempo_inicio_modo >= 5:
+                self.modo = "sleep"
+                self.tiempo_inicio_modo = segundos
+
+        elif self.modo == "sleep":
+            if segundos - self.tiempo_inicio_modo >= 15:
+                self.modo = "sleepy_scatter"
+                self.tiempo_inicio_modo = segundos
 
 
