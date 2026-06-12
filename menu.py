@@ -2,6 +2,7 @@ import pygame
 import os
 pygame.init()
 fondo = pygame.image.load("fondo_menu.jpg")
+
 # Cargamos todas las imagenes al principio y las de las carpetas
 # para despues con un loop hacer la animacion, y el high score
 pacman_logo = pygame.image.load("pacman-logo.png")
@@ -23,6 +24,13 @@ with open("high_score.txt") as f:
     high_score = f.read().strip()
 
 pantalla = pygame.display.set_mode((560, 775))
+
+# sprites de los fantasmas para el menu de seleccion (mirando izq/der, en vez de circulos de color)
+sprites_fantasmas = {}
+for _nombre in ("blinky", "pinky", "inky", "clyde", "sleepy", "bonnie"):
+    _izq = pygame.transform.scale(pygame.image.load(f"Sprites/fase1/{_nombre}_left.png").convert_alpha(), (40, 40))
+    _der = pygame.transform.scale(pygame.image.load(f"Sprites/fase1/{_nombre}_right.png").convert_alpha(), (40, 40))
+    sprites_fantasmas[_nombre] = {"left": _izq, "right": _der}
 
 def crear_fantasma(name, color, desc, cords):
     return {"name": name, "color": color, "desc": desc, "cords": cords}
@@ -135,9 +143,13 @@ def menu_fantasmas(pantalla: pygame.Surface, fantasmas: list[dict]) -> list[dict
 
 
 
-            color_rgb = COLORES_RGB[f["color"]]
+            # sprite del fantasma mirando de izquierda a derecha (en vez del circulo de color)
+            sprite_par = sprites_fantasmas[f["name"].lower()]
+            mirando = "right" if (pygame.time.get_ticks() // 400) % 2 == 0 else "left"
+            sprite = sprite_par[mirando]
             centro = (rect.left + 30, rect.centery)
-            pygame.draw.circle(pantalla, color_rgb, centro, 20)
+            rect_sprite = sprite.get_rect(center=centro)
+            pantalla.blit(sprite, rect_sprite)
 
         pygame.display.update()
 

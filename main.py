@@ -61,6 +61,13 @@ def sprite_fantasma(fantasma, fase_sprites):
     if fantasma.modo == 'volver_a_casa':
         archivo = f'volver_a_casa_{fantasma.direccion}.png'
         return pygame.image.load(os.path.join('Sprites', archivo))
+    
+
+    if fantasma.nombre == "sleepy" and fantasma.modo == "sleep":
+        archivo = f'sleepy_closed_{fantasma.direccion}.png'
+        return pygame.image.load(os.path.join('Sprites', fase_sprites, archivo))
+
+
     nombre = fantasma.nombre
     direccion = fantasma.direccion
     
