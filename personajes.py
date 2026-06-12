@@ -160,7 +160,7 @@ class pacman(personaje):
         
         self.direccion = self.direccion_deseada
 
-    def analisis_comer(self, mapa: dict, puntaje) -> dict | int | bool:
+    def analisis_comer(self, mapa: dict, puntaje, waka_waka) -> dict | int | bool:
         """
         A ejecutarse cuando el personaje esta centrado en una casilla. Si la casilla tiene un comestible (punto, powerpellet), lo remueve del mapa y registra la accion
         """
@@ -170,6 +170,7 @@ class pacman(personaje):
         
         comio_powerpellet = False
         if mapa[(x, y)] == 'punto': 
+            waka_waka.play()
             mapa[(x, y)] = 'pasillo' # remueve el punto del mapa
             puntaje += 10 # suma 10 puntos por el consumible "punto"
         elif  mapa[(x, y)] == 'power':
@@ -212,7 +213,7 @@ class pacman(personaje):
         
         self.direccion_deseada = tecla
         
-    def frame_pacman(self, mapa: dict, puntaje: int) -> dict | int | bool:
+    def frame_pacman(self, mapa: dict, puntaje: int, waka_waka) -> dict | int | bool:
         """
         Se ejecuta todos los frames. Procesa todas las acciones del personaje (movimiento, comestibles, etc.). Devuelve el diccionario con el mapa actualizado y el nuevo puntaje del jugador
         """
@@ -229,7 +230,7 @@ class pacman(personaje):
             
         if self.posicion_perfecta():
             self.casilla = (self.posx/20, self.posy/20)
-            mapa, puntaje, comio_powerpellet = self.analisis_comer(mapa, puntaje)
+            mapa, puntaje, comio_powerpellet = self.analisis_comer(mapa, puntaje, waka_waka)
             self.chequeo_tunel(mapa)
             
         return mapa, puntaje, comio_powerpellet
