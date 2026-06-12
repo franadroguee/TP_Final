@@ -154,6 +154,7 @@ def menu_fantasmas(pantalla: pygame.Surface, fantasmas: list[dict]) -> list[dict
         pygame.display.update()
 
         if len(fantasmas_seleccionados) >= 4:
+
             return fantasmas_seleccionados
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:

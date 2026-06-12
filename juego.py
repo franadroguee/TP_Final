@@ -7,9 +7,11 @@ def main():
     import random
     from menu import start
     from game_over import game_over
-
+    from ready import ready
 
     # inicializacion de pygame -----------------------------------------------------------
+    # pre_init con buffer chico = menos latencia al reproducir efectos (debe ir ANTES de pygame.init)
+    pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
     pygame.init()
     pygame.mixer.init()
 
@@ -19,13 +21,14 @@ def main():
     sonido_muerte = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'muerte.mp3'))
     sonido_comer_fantasma = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'se-come-fantasma.mp3'))
     sonido_vida_extra = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'vida-extra.mp3'))
-    waka_waka = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'pacman-waka-waka.mp3'))
+    waka_waka = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'pacman-waka-waka.wav'))  # WAV = sin delay del mp3
 
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(-1)
     waka_waka.play(-1)
 
     fantasmas_y_esquinas = start()
+    ready()
 
     # modos globales --------------------------------------------------------------------------------------
     fases = [
@@ -61,6 +64,7 @@ def main():
         'power': pygame.image.load(os.path.join('Sprites', 'powerpellet.png')),
         'puerta': pygame.image.load(os.path.join('Sprites', 'puerta.png')),
         'punto': pygame.image.load(os.path.join('Sprites', 'punto.png')),
+        'tunel': pygame.image.load(os.path.join('Sprites', 'tunel.png')),
     }
 
 
@@ -235,7 +239,7 @@ def main():
 
         # Renderizado del mapa y logica PacMan -----------------------------------------------------------------------------------
         renderizado(pantalla, dic_mapa, graficos_mapa)
-        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, waka_waka)
+        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, canal_waka)
 
         # efecto de los powerpellets ------------------------------------------------------------------
         if comio_powerpellet:
