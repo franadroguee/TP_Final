@@ -72,7 +72,7 @@ def sprite_pacman(jugador, fase_sprites):
 
 salto = 0.2 # cada {salto} se mueven las aletas de los fantasmas y PacMan abre/cierra la boca
 
-game_font = pygame.font.Font(None, 50)
+game_font = pygame.font.Font('PacMan_font.ttf', 25)
 white = (255, 255, 255)
 
 # inicio de la logica del juego ------------------------------------------------------------------
@@ -125,12 +125,10 @@ for i in range(4):
     
 
 if 'blinky' in nombres_fantasmas: # informacion de blinky para la logica de chase de inky
-    index = nombres_fantasmas.index('blinky')
+    indice_blinky = nombres_fantasmas.index('blinky')
 else:
-    index = random.randint(0, 3)
+    indice_blinky = random.randint(0, 3)
     
-blinky_pos = posiciones_fantasmas[index]
-
 # definicion de variables --------------------------------------------------------------------------------------
 fantasmas_activados = 0
 puntaje_final = 0
@@ -160,7 +158,9 @@ while playing:
         vida_extra_otorgada = True
     
     segundos = (pygame.time.get_ticks()/1000) - tiempo_en_menu #tiempo de juego
-    text_surface = game_font.render(f"Puntaje: {puntaje} pts. Vidas: {vidas}", True, white) # actualizacion puntaje
+    text_surface1 = game_font.render(f"Puntaje: {puntaje} pts.", True, white) # actualizacion puntaje
+    text_surface2 = game_font.render(f"Vidas: {vidas}", True, white)
+    
         
     # activacion de los fantasmas (salen en orden) --------------------------------------------------------------------------------------
     if fantasmas_activados < 1:
@@ -266,7 +266,7 @@ while playing:
         
         if f.modo in ['chase', 'scatter', 'salir_de_casa', None]: #sprite normal
             imagen = sprite_fantasma(f, fase_sprites)
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos,segundos)
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, fantasmas, indice_blinky,segundos)
        
         elif f.modo == 'scared': 
             if not parpadeo_scared: # sprite 'scared'
@@ -274,17 +274,18 @@ while playing:
             else: # si faltan 2 segundos o menos para que termine el efecto del parpadeo
                 imagen = pygame.image.load(os.path.join('Sprites', fase_sprites, 'scared.png')) if ((segundos // 0.5) % 2 == 0) else pygame.image.load(os.path.join('Sprites', fase_sprites, 'parpadeo_scared.png'))
             
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos,segundos)
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, fantasmas, indice_blinky,segundos)
         
         else:
             imagen = sprite_fantasma(f, fase_sprites)
-            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, blinky_pos,segundos)
+            f.frame_ghost(porcentaje_velocidad(75), ghost_places, dic_mapa, info_bots, imagen, pantalla, fantasmas, indice_blinky, segundos)
         
             
         rect.topleft = (f.posx, f.posy)
     
     # renderizado de PacMan -----------------------------------------------------------------------------
-    pantalla.blit(text_surface, (100, 620)) # puntaje y vidas
+    pantalla.blit(text_surface1, (0, 620)) # puntaje y vidas
+    pantalla.blit(text_surface2, (0, 670))
     
     pantalla.blit(sprite_pacman(jugador, fase_sprites), (jugador.posx, jugador.posy))
     

@@ -31,7 +31,7 @@ datos = [
     ("Inky",   "celeste", "El flanqueador"),
     ("Clyde",  "naranja", "El tímido"),
     ("Sleepy",  "gris",   "El dormido"),
-    ("Coward", "violeta", "El cobarde"),
+    ("Bonnie", "verde", "El cobarde"),
 ]
 
 x, ancho, alto, espacio = 100, 360, 70, 15
@@ -43,7 +43,7 @@ COLORES_RGB = {
     "celeste": (0, 200, 255),
     "naranja": (255, 140, 0),
     "gris":    (128, 128, 128),
-    "violeta": (160, 32, 240),
+    "verde": (0, 255, 0),
 }
 
 fantasmas = []
