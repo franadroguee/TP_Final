@@ -7,7 +7,7 @@ def main():
     import random
     from menu import start
     from game_over import game_over
-
+    from ready import ready
 
     # inicializacion de pygame -----------------------------------------------------------
     # pre_init con buffer chico = menos latencia al reproducir efectos (debe ir ANTES de pygame.init)
@@ -30,6 +30,7 @@ def main():
     canal_waka.pause()
 
     fantasmas_y_esquinas = start()
+    ready()
 
     # modos globales --------------------------------------------------------------------------------------
     fases = [
