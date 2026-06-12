@@ -4,7 +4,7 @@ from mapa import mapa, renderizado
 from personajes import pacman, fantasma
 import random
 from menu import start
-
+from game_over import game_over
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
 pygame.mixer.init()
@@ -350,7 +350,7 @@ while playing:
         if puntaje > int(highest_score):
             with open("high_score.txt", "w") as f:
                 f.write(str(puntaje))
-
+        game_over(puntaje)
 
     
     # recepcion input ---------------------------------------------------------------------
