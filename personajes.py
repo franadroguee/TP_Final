@@ -170,13 +170,16 @@ class pacman(personaje):
         
         comio_powerpellet = False
         if mapa[(x, y)] == 'punto': 
-            waka_waka.play()
+            waka_waka.unpause()
             mapa[(x, y)] = 'pasillo' # remueve el punto del mapa
             puntaje += 10 # suma 10 puntos por el consumible "punto"
         elif  mapa[(x, y)] == 'power':
             mapa[(x, y)] = 'pasillo'
             puntaje += 20 # suma 20 puntos por el consumible "PowerPellet"
             comio_powerpellet = True
+            waka_waka.pause()
+        else:
+            waka_waka.pause()
             
         return mapa, puntaje, comio_powerpellet            
         

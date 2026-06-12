@@ -23,6 +23,8 @@ def main():
 
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(-1)
+    waka_waka.play(-1)
+    waka_waka.pause()
 
     fantasmas_y_esquinas = start()
 
