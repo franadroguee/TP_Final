@@ -3,7 +3,7 @@ import os
 pygame.init()
 fondo = pygame.image.load("fondo_menu.jpg")
 # Cargamos todas las imagenes al principio y las de las carpetas
-# para despues con un loop hacer la animacion
+# para despues con un loop hacer la animacion, y el high score
 pacman_logo = pygame.image.load("pacman-logo.png")
 pacman_logo = pygame.transform.scale(pacman_logo, (424.2, 211.8))
 gif_pacman = sorted(os.listdir("gif_pacman"))
@@ -18,6 +18,9 @@ for n in gif_coin:
     imagen = pygame.image.load(f"./gif_coin/{n}")
     imagen = pygame.transform.scale(imagen, (50, 50))
     frames_coin.append(imagen)
+
+with open("high_score.txt") as f:
+    high_score = f.read().strip()
 
 pantalla = pygame.display.set_mode((560, 775))
 
@@ -53,7 +56,7 @@ for i, (name, color, desc) in enumerate(datos):
 
 def pantalla_inicio(pantalla: pygame.Surface) -> bool:
     """Carga la pantalla inicial, inicia las animaciones devuelve true si el usuario presiona alguna key"""
-    fuente_titulo = pygame.font.Font(None, 70)
+    fuente_titulo = pygame.font.Font(None, 50)
     fuente_texto  = pygame.font.Font(None, 50)
     amarillo = (255, 221, 0)
     blanco   = (255, 255, 255)
@@ -69,6 +72,15 @@ def pantalla_inicio(pantalla: pygame.Surface) -> bool:
         #pantalla.blit(titulo, rect_titulo)
         indice_pacman = (pygame.time.get_ticks() // 50) % len(frames_pacman)
         pantalla.blit(frames_pacman[indice_pacman], (0, 0))
+        texto_high = fuente_titulo.render("Highest Score:", True, blanco)
+        rect_texto = texto_high.get_rect(center=(280, 400))
+        rect_texto.y += 150
+        pantalla.blit(texto_high, rect_texto)
+        punto_high = fuente_titulo.render(high_score, True, blanco)
+        rect_punto = punto_high.get_rect(center=(280, 400))
+        rect_punto.y += 200
+        pantalla.blit(punto_high, rect_punto)
+
 
         if (pygame.time.get_ticks() // 500) % 2 == 0:
             texto = fuente_texto.render("Insert Coin", True, COLORES_RGB["rojo"])

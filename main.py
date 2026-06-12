@@ -319,6 +319,13 @@ while playing:
     # GAME OVER ---------------------------------------------------------------------------
     if vidas == 0:
         playing = False
+        with open("high_score.txt") as f:
+            highest_score = f.read().strip()
+        if puntaje > int(highest_score):
+            with open("high_score.txt", "w") as f:
+                f.write(str(puntaje))
+
+
     
     # recepcion input ---------------------------------------------------------------------
     for event in pygame.event.get():    
