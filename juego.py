@@ -234,7 +234,7 @@ def main():
 
         # Renderizado del mapa y logica PacMan -----------------------------------------------------------------------------------
         renderizado(pantalla, dic_mapa, graficos_mapa)
-        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje)
+        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, waka_waka)
 
         # efecto de los powerpellets ------------------------------------------------------------------
         if comio_powerpellet:
@@ -287,9 +287,6 @@ def main():
         # Fases de los Sprites ----------------------------------------------------------
         fase = (segundos // salto) % 2
         fase_sprites = 'fase1' if fase == 0 else 'fase2'
-
-        if fase_frame_anterior == 'fase1' and fase_sprites != fase_frame_anterior:
-            waka_waka.play()
 
         fase_frame_anterior = fase_sprites
 
