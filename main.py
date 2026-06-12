@@ -7,7 +7,18 @@ from menu import start
 from game_over import game_over
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
+pygame.mixer.init()
+
 pantalla = pygame.display.set_mode((560, 775))
+
+cancion_base = pygame.mixer.music.load(os.path.join('sonidos-pacman', 'cancion-base.mp3'))
+sonido_muerte = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'muerte.mp3'))
+sonido_comer_fantasma = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'se-come-fantasma.mp3'))
+sonido_vida_extra = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'vida-extra.mp3'))
+waka_waka = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'pacman-waka-waka.mp3'))
+
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play(-1)
 
 fantasmas_y_esquinas = start()
 
@@ -156,11 +167,14 @@ inicio_fases = 0
 cantidad_fantasmas_comidos = 0
 puntaje_por_fantasmas_comidos = [0, 200, 400, 800, 1600]
 
+fase_frame_anterior = 'fase1'
+
 tiempo_en_menu = pygame.time.get_ticks()/1000
 # loop del juego --------------------------------------------------------------------------------------
 while playing:
     # si se superan los 10000 puntos, se otorga una vida extra una unica vez
     if puntaje >= 10000 and not vida_extra_otorgada:
+        sonido_vida_extra.play()
         vidas += 1
         vida_extra_otorgada = True
     
@@ -268,6 +282,11 @@ while playing:
     fase = (segundos // salto) % 2
     fase_sprites = 'fase1' if fase == 0 else 'fase2'
     
+    if fase_frame_anterior == 'fase1' and fase_sprites != fase_frame_anterior:
+        waka_waka.play()
+    
+    fase_frame_anterior = fase_sprites
+    
     # logica de los fantasmas --------------------------------------------------------------------------------------
     for f, rect in zip(fantasmas, rects_fantasmas):
         
@@ -304,6 +323,7 @@ while playing:
     for ghost, rect in zip(fantasmas, rects_fantasmas):
         if pacman_rect.colliderect(rect):
             if ghost.modo == 'scared':
+                sonido_comer_fantasma.play()
                 cantidad_fantasmas_comidos += 1
                 puntaje += puntaje_por_fantasmas_comidos[cantidad_fantasmas_comidos]
                 ghost.cambio_de_modo('volver_a_casa')
@@ -311,6 +331,7 @@ while playing:
             elif ghost.modo == 'volver_a_casa':
                 pass
             else:
+                sonido_muerte.play()
                 inicio_fases = segundos
                 modo_fantasmas_global = 'scatter'
                 tiempo_pausado = 0
