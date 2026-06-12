@@ -284,7 +284,7 @@ while playing:
         rect.topleft = (f.posx, f.posy)
     
     # renderizado de PacMan -----------------------------------------------------------------------------
-    pantalla.blit(text_surface1, (0, 620)) # puntaje y vidas
+    pantalla.blit(text_surface1, (0, 630)) # puntaje y vidas
     pantalla.blit(text_surface2, (0, 670))
     
     pantalla.blit(sprite_pacman(jugador, fase_sprites), (jugador.posx, jugador.posy))

@@ -56,8 +56,8 @@ for i, (name, color, desc) in enumerate(datos):
 
 def pantalla_inicio(pantalla: pygame.Surface) -> bool:
     """Carga la pantalla inicial, inicia las animaciones devuelve true si el usuario presiona alguna key"""
-    fuente_titulo = pygame.font.Font(None, 50)
-    fuente_texto  = pygame.font.Font(None, 50)
+    fuente_titulo = pygame.font.Font('PacMan_font.ttf', 35)
+    fuente_texto  = pygame.font.Font('PacMan_font.ttf', 20)
     amarillo = (255, 221, 0)
     blanco   = (255, 255, 255)
     negro    = (0, 0, 0)
@@ -103,9 +103,9 @@ def pantalla_inicio(pantalla: pygame.Surface) -> bool:
 def menu_fantasmas(pantalla: pygame.Surface, fantasmas: list[dict]) -> list[dict]:
 
     """List -> List, obtiene la lista de diccionarios de todos los fantasmas y devuelve una lista de diccionarios con los fantasmas seleccionados"""
-    fuente_titulo= pygame.font.Font(None, 40)
-    fuente_grande = pygame.font.Font(None, 30)
-    fuente_chica = pygame.font.Font(None, 20)
+    fuente_titulo= pygame.font.Font('PacMan_font.ttf', 20)
+    fuente_grande = pygame.font.Font('PacMan_font.ttf', 20)
+    fuente_chica = pygame.font.Font('PacMan_font.ttf', 15)
     blanco = (255, 255, 255)
     azul   = (33, 33, 222)
     amarillo = (255, 221, 0)
@@ -155,9 +155,9 @@ def menu_fantasmas(pantalla: pygame.Surface, fantasmas: list[dict]) -> list[dict
 def menu_posiciones(pantalla: pygame.Surface, fantasmas_seleccionados: list[dict]) -> list[dict]:
 
     """List -> List, Toma los fantasmas seleccionados previament y les asigna una posicion a donde ir al comenzar el juego. Lo guarda en una lista con ficcionario de la forma: {fantasma}: {cordenadas}"""
-    fuente_titulo = pygame.font.Font(None, 70)
-    fuente_texto = pygame.font.Font(None, 30)
-    fuente_texto_2 = pygame.font.Font(None, 50)
+    fuente_titulo = pygame.font.Font('PacMan_font.ttf', 20)
+    fuente_texto = pygame.font.Font('PacMan_font.ttf', 10)
+    fuente_texto_2 = pygame.font.Font('PacMan_font.ttf', 20)
     negro = (0, 0, 0)
     blanco = (255, 255, 255)
     fantasmas_posiciones = {}
