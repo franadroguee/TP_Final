@@ -1,4 +1,5 @@
 import pygame
+from juego import main
 pygame.init()
 negro = (0, 0, 0)
 red = (255,0,0)
@@ -18,12 +19,13 @@ def game_over(your_score):
 
         fuente_titulo = pygame.font.Font('PacMan_font.ttf', 35)
         fuente_chica =pygame.font.Font('PacMan_font.ttf', 20)
+        fuente_mini = pygame.font.Font('PacMan_font.ttf', 15)
         pantalla.blit(fondo, (0, 0))
 
-
-        texto = fuente_titulo.render("Game Over", True, red)
-        rect_texto = texto.get_rect(center=pantalla.get_rect().center)
-        pantalla.blit(texto, (rect_texto.x, 60))
+        if (pygame.time.get_ticks() // 500) % 2 == 0:
+            texto = fuente_titulo.render("Game Over", True, red)
+            rect_texto = texto.get_rect(center=pantalla.get_rect().center)
+            pantalla.blit(texto, (rect_texto.x, 60))
 
         tu_score = fuente_chica.render("Tu puntaje", True, blanco)
         rect_texto_tu_score = tu_score.get_rect(center=pantalla.get_rect().center)
@@ -40,6 +42,10 @@ def game_over(your_score):
         max_score_puntos = fuente_chica.render(str(highest_score), True, amarillo)
         rect_texto_max_score_puntos = max_score_puntos.get_rect(center=pantalla.get_rect().center)
         pantalla.blit(max_score_puntos, (rect_texto_max_score_puntos.x, 310))
+        if (pygame.time.get_ticks() // 500) % 2 == 0:
+            press_enter = fuente_mini.render("Toca una tecla", True, blanco)
+            rect_press_enter = press_enter.get_rect(center=pantalla.get_rect().center)
+            pantalla.blit(press_enter, (rect_press_enter.x, 650))
 
         rect_logo = img.get_rect(center=(270, 500))
         pantalla.blit(img, rect_logo)
@@ -48,7 +54,9 @@ def game_over(your_score):
         pygame.display.update()
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.KEYDOWN:
+                main()
+            elif event.type == pygame.QUIT:
                 corriendo = False
 
 
