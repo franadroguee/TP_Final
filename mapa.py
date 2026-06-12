@@ -73,7 +73,10 @@ def renderizado(pantalla, dic_mapa: dict, graficos: dict) -> None:
         elif celda == 'puerta': # puerta ghost house
             pantalla.blit(graficos['puerta'], (numero))
         elif celda == 'tunel': # tunel lateral
-            pass
+            if x < 280: # tunel izquierdo: fade hacia adentro
+                pantalla.blit(graficos['tunel'], (numero))
+            else: # tunel derecho: mismo fade pero espejado
+                pantalla.blit(pygame.transform.flip(graficos['tunel'], True, False), (numero))
         elif celda == 'inicio':
             pass
             
