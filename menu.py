@@ -2,7 +2,8 @@ import pygame
 import os
 pygame.init()
 fondo = pygame.image.load("fondo_menu.jpg")
-
+# Cargamos todas las imagenes al principio y las de las carpetas
+# para despues con un loop hacer la animacion
 pacman_logo = pygame.image.load("pacman-logo.png")
 pacman_logo = pygame.transform.scale(pacman_logo, (424.2, 211.8))
 gif_pacman = sorted(os.listdir("gif_pacman"))
@@ -50,7 +51,8 @@ for i, (name, color, desc) in enumerate(datos):
     y = y_inicial + i * (alto + espacio)
     fantasmas.append(crear_fantasma(name, color, desc, (x, y, ancho, alto)))
 
-def pantalla_inicio(pantalla):
+def pantalla_inicio(pantalla: pygame.Surface) -> bool:
+    """Carga la pantalla inicial, inicia las animaciones devuelve true si el usuario presiona alguna key"""
     fuente_titulo = pygame.font.Font(None, 70)
     fuente_texto  = pygame.font.Font(None, 50)
     amarillo = (255, 221, 0)
@@ -86,7 +88,9 @@ def pantalla_inicio(pantalla):
 
         reloj.tick(60)
 
-def menu_fantasmas(pantalla, fantasmas):
+def menu_fantasmas(pantalla: pygame.Surface, fantasmas: list[dict]) -> list[dict]:
+
+    """List -> List, obtiene la lista de diccionarios de todos los fantasmas y devuelve una lista de diccionarios con los fantasmas seleccionados"""
     fuente_titulo= pygame.font.Font(None, 40)
     fuente_grande = pygame.font.Font(None, 30)
     fuente_chica = pygame.font.Font(None, 20)
@@ -136,7 +140,9 @@ def menu_fantasmas(pantalla, fantasmas):
             if event.type == pygame.QUIT:
                 return
 
-def menu_posiciones(pantalla, fantasmas_seleccionados):
+def menu_posiciones(pantalla: pygame.Surface, fantasmas_seleccionados: list[dict]) -> list[dict]:
+
+    """List -> List, Toma los fantasmas seleccionados previament y les asigna una posicion a donde ir al comenzar el juego. Lo guarda en una lista con ficcionario de la forma: {fantasma}: {cordenadas}"""
     fuente_titulo = pygame.font.Font(None, 70)
     fuente_texto = pygame.font.Font(None, 30)
     fuente_texto_2 = pygame.font.Font(None, 50)

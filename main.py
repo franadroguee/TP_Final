@@ -7,7 +7,7 @@ from menu import start
 
 # inicializacion de pygame -----------------------------------------------------------
 pygame.init()
-pantalla = pygame.display.set_mode((560, 775), pygame.FULLSCREEN)
+pantalla = pygame.display.set_mode((560, 775))
 
 fantasmas_y_esquinas = start()
 
