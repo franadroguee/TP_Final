@@ -246,7 +246,7 @@ class fantasma(personaje):
         self.tiempo_inicio_modo = 0
         self.modo_anterior = None
 
-    def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, blinky_pos: tuple, segundos: float) -> None:
+    def frame_ghost(self, velocidad_normal_fantasma, ghost_places: list, mapa: dict, info_bots: tuple, grafico, pantalla, fantasmas: list, index_blinky, segundos: float) -> None:
         "A ejecutarse todos los frames. Revisa, primero si "
         if self.modo == None:
             pantalla.blit(grafico, (self.posx, self.posy))
@@ -280,9 +280,22 @@ class fantasma(personaje):
                 elif self.nombre == 'pinky':
                     self.direccion = self.pinky_chase(info_bots, mapa)
                 elif self.nombre == 'inky':
+                    blinky = fantasmas[index_blinky]
+                    blinky_pos = blinky.casilla
                     self.direccion = self.inky_chase(info_bots, mapa, blinky_pos)
                 elif self.nombre == 'clyde':
                     self.direccion = self.clyde_chase(info_bots, mapa)
+                elif self.nombre == 'bonnie':
+                    index = None
+                    for ind, f in enumerate(fantasmas):
+                        if f.nombre == 'clyde':
+                            index = ind
+                    
+                    if index == None:
+                        self.direccion = self.dirigirse_a_casilla(info_bots[0], mapa)
+                    else:
+                        self.direccion = self.bonnie_chase(info_bots, mapa, fantasmas, index)
+                            
                     
             elif self.modo == 'volver_a_casa':
                 self.direccion = self.dirigirse_a_casilla((15,13), mapa)
@@ -424,6 +437,16 @@ class fantasma(personaje):
             return self.dirigirse_a_casilla(pos_pacman, mapa)
         else:
             return self.dirigirse_a_casilla(self.esquina, mapa)
+        
+    def bonnie_chase(self, info_bots, mapa, fantasmas, index):
+        pos_pacman = info_bots[0]
+        if distancia(fantasmas[index].casilla, pos_pacman) <= 8:
+            return self.dirigirse_a_casilla(pos_pacman, mapa)
+        else:
+            return self.dirigirse_a_casilla(self.esquina, mapa)
+
+            
+
 
     def scared(self, pos_pacman, mapa):
         """
