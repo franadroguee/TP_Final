@@ -8,6 +8,7 @@ def main():
     from menu import start
     from game_over import game_over
     from ready import ready
+    from level import level
 
     # inicializacion de pygame -----------------------------------------------------------
     # pre_init con buffer chico = menos latencia al reproducir efectos (debe ir ANTES de pygame.init)
@@ -17,17 +18,23 @@ def main():
 
     pantalla = pygame.display.set_mode((560, 775))
 
-    cancion_base = pygame.mixer.music.load(os.path.join('sonidos-pacman', 'cancion-base.mp3'))
     sonido_muerte = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'muerte.mp3'))
     sonido_comer_fantasma = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'se-come-fantasma.mp3'))
     sonido_vida_extra = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'vida-extra.mp3'))
+    sonido_cherry = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'pacman-eating-cherry.mp3'))  # al comer power pellet
     waka_waka = pygame.mixer.Sound(os.path.join('sonidos-pacman', 'pacman-waka-waka.wav'))  # WAV = sin delay del mp3
 
     pygame.mixer.music.set_volume(0.2)
+    # musica del menu: cancion-base
+    pygame.mixer.music.load(os.path.join('sonidos-pacman', 'cancion-base.mp3'))
     pygame.mixer.music.play(-1)
 
     fantasmas_y_esquinas = start()
     ready()
+
+    # musica del juego: siren mientras se juega
+    pygame.mixer.music.load(os.path.join('sonidos-pacman', 'pacman-siren.mp3'))
+    pygame.mixer.music.play(-1)
 
     # modos globales --------------------------------------------------------------------------------------
     fases = [
@@ -65,6 +72,9 @@ def main():
         'punto': pygame.image.load(os.path.join('Sprites', 'punto.png')),
         'tunel': pygame.image.load(os.path.join('Sprites', 'tunel.png')),
     }
+
+    # frames de la animacion de muerte de pacman (boca abriendose hasta desaparecer)
+    frames_muerte = [pygame.image.load(os.path.join('Sprites', 'death', f'death_{i}.png')) for i in range(12)]
 
 
     # Sprites --------------------------------------------------------------------------------------------
@@ -131,6 +141,7 @@ def main():
     jugador = pacman(pac_x_inic * 20, pac_y_inic * 20, porcentaje_velocidad(80))
     pacman_rect = pygame.Rect(jugador.posx, jugador.posy, 20, 20)
     vida_extra_otorgada = False
+    muerte_pos = (jugador.posx, jugador.posy)  # se actualiza cuando muere; default por seguridad
 
     # inicializacion de los fantasmas ------------------------------------------------------------
     nombres_fantasmas = []
@@ -164,7 +175,7 @@ def main():
 
     puntaje = 0
     vidas = 3
-
+    nivel = 0
     ultimo_chequeo_puntos = 0
 
     ultimo_powerpellet_comido = 0
@@ -207,32 +218,36 @@ def main():
             fantasmas[3].modo = 'salir_de_casa'
             fantasmas_activados += 1
 
-        # LEVEL UP (revisa cada 3 segundos) ----------------------------------------------------------------
-        if segundos - ultimo_chequeo_puntos >= 3:
-            hay_puntos = False
-            for item in dic_mapa.values():
-                if item == 'punto' or item == 'power':
-                    hay_puntos = True
-                    break
+        # LEVEL UP (se revisa cada frame para que el cartel aparezca al instante) -------------------------
+        hay_puntos = False
+        for item in dic_mapa.values():
+            if item == 'punto' or item == 'power':
+                hay_puntos = True
+                break
 
-            if hay_puntos:
-                pass
-            else:
-                dic_mapa = mapa('mapa.txt', graficos_mapa)
-                jugador.posx = pac_x_inic * 20
-                jugador.posy = pac_y_inic * 20
-                inicio_fases = segundos
-                modo_fantasmas_global = 'scatter'
-                tiempo_pausado = 0
-                fantasmas_activados = 0
-                puntaje_final = puntaje
+        if not hay_puntos:
+            nivel += 1
+            pygame.mixer.music.stop()  # frena la siren mientras se muestra el cartel de nivel
+            t_antes = pygame.time.get_ticks()
+            level(nivel, puntaje)
+            # descuenta el tiempo que estuvo el cartel para que no corra el timer de fases
+            tiempo_en_menu += (pygame.time.get_ticks() - t_antes) / 1000
+            dic_mapa = mapa('mapa.txt', graficos_mapa)
+            jugador.posx = pac_x_inic * 20
+            jugador.posy = pac_y_inic * 20
+            inicio_fases = segundos
+            modo_fantasmas_global = 'scatter'
+            tiempo_pausado = 0
+            fantasmas_activados = 0
+            puntaje_final = puntaje
 
-                for ghost in fantasmas:
-                    ghost.posx = ghost.spawn[0] * 20
-                    ghost.posy = ghost.spawn[1] * 20
-                    ghost.modo = None
+            for ghost in fantasmas:
+                ghost.posx = ghost.spawn[0] * 20
+                ghost.posy = ghost.spawn[1] * 20
+                ghost.modo = None
+                ghost.velocidad = porcentaje_velocidad(75)  # resetea velocidad (evita que quede en 150% de volver_a_casa)
 
-            ultimo_chequeo_puntos = segundos
+            pygame.mixer.music.play(-1)  # reanuda la siren al volver a jugar
 
         pantalla.fill((0, 0, 0))  # elimina los sprites del frame anterior
 
@@ -242,6 +257,7 @@ def main():
 
         # efecto de los powerpellets ------------------------------------------------------------------
         if comio_powerpellet:
+            sonido_cherry.play()  # sonido al comer un power pellet
             if fantasmas_scared:  # si comio un powerpellet durante el efecto de otro
                 tiempo_pausado += segundos - ultimo_powerpellet_comido  # ataja el ocasional caso de que un powerpellet sea comido durante el efecto de otro
                 parpadeo_scared = False
@@ -350,7 +366,7 @@ def main():
                 elif ghost.modo == 'volver_a_casa':
                     pass
                 else:
-                    sonido_muerte.play()
+                    muerte_pos = (jugador.posx, jugador.posy)  # donde murio pacman (para la animacion final)
                     inicio_fases = segundos
                     modo_fantasmas_global = 'scatter'
                     tiempo_pausado = 0
@@ -363,15 +379,27 @@ def main():
                         ghost.posx = ghost.spawn[0] * 20
                         ghost.posy = ghost.spawn[1] * 20
                         ghost.modo = 'salir_de_casa'
+                        ghost.velocidad = porcentaje_velocidad(75)  # resetea velocidad (evita que quede en 150% de volver_a_casa)
 
         # GAME OVER ---------------------------------------------------------------------------
         if vidas == 0:
             playing = False
+            pygame.mixer.music.stop()  # frena la siren al perder (animacion de muerte + game over sin musica)
+            sonido_muerte.play()  # el sonido de muerte suena solo cuando se acaban las vidas
+            # animacion de muerte de pacman (boca abriendose) en el lugar donde murio
+            for frame in frames_muerte:
+                pygame.event.pump()  # mantiene la ventana viva durante la animacion
+                pantalla.fill((0, 0, 0))
+                renderizado(pantalla, dic_mapa, graficos_mapa)
+                pantalla.blit(frame, muerte_pos)
+                pygame.display.update()
+                pygame.time.delay(120)  # ms por frame
             with open("high_score.txt") as f:
                 highest_score = f.read().strip()
             if puntaje > int(highest_score):
                 with open("high_score.txt", "w") as f:
                     f.write(str(puntaje))
+            pygame.event.clear()  # descarta teclas encoladas para que game_over no se reinicie solo
             game_over(puntaje)
 
         # recepcion input ---------------------------------------------------------------------
