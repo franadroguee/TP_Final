@@ -26,9 +26,6 @@ def main():
 
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(-1)
-    # .play() devuelve el Channel; pause()/unpause() son del Channel, no del Sound
-    canal_waka = waka_waka.play(-1)
-    canal_waka.pause()
 
     fantasmas_y_esquinas = start()
     ready()
@@ -244,7 +241,7 @@ def main():
 
         # Renderizado del mapa y logica PacMan -----------------------------------------------------------------------------------
         renderizado(pantalla, dic_mapa, graficos_mapa)
-        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, canal_waka)
+        dic_mapa, puntaje, comio_powerpellet = jugador.frame_pacman(dic_mapa, puntaje, waka_waka)
 
         # efecto de los powerpellets ------------------------------------------------------------------
         if comio_powerpellet:
@@ -277,7 +274,11 @@ def main():
 
             for ghost in fantasmas:
                 if ghost.modo == 'scared':
-                    ghost.cambio_de_modo(modo_fantasmas_global)
+                    if ghost.nombre == 'sleepy':
+                        ghost.cambio_de_modo('sleep')
+                    else:
+                        ghost.cambio_de_modo(modo_fantasmas_global)
+                        
                     ghost.velocidad = porcentaje_velocidad(75)
 
         # manejo de los modos globales --------------------------------------------------------------------------------------
@@ -289,6 +290,10 @@ def main():
                 modo_fantasmas_global = nuevo_modo
 
                 for ghost in fantasmas:
+                    if ghost.nombre == 'sleepy' and ghost.modo not in ['salir_de_casa', 'volver_a_casa'] and modo_fantasmas_global == 'chase':
+                        ghost.cambio_de_modo('sleep')
+                        continue
+                    
                     if ghost.modo in ('scatter', 'chase'):
                         ghost.cambio_de_modo(modo_fantasmas_global)
 
