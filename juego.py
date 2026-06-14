@@ -399,6 +399,7 @@ def main():
             if puntaje > int(highest_score):
                 with open("high_score.txt", "w") as f:
                     f.write(str(puntaje))
+            pygame.event.clear()  # descarta teclas encoladas para que game_over no se reinicie solo
             game_over(puntaje)
 
         # recepcion input ---------------------------------------------------------------------
