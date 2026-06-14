@@ -16,7 +16,7 @@ def ready():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return
+                return 'quit'
 
         pantalla.blit(fondo, (0, 0))
 
@@ -32,7 +32,7 @@ def ready():
 
         time.sleep(1)
         n -= 1
-    return
+    
 
 
 

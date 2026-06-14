@@ -188,6 +188,9 @@ def menu_posiciones(pantalla: pygame.Surface, fantasmas_seleccionados: list[dict
     while True:
         if len(fantasmas_posiciones) >= 4:
             return fantasmas_posiciones
+
+        if fantasmas_seleccionados == None:
+            return None
         for f in fantasmas_seleccionados:
             while f["name"] not in fantasmas_posiciones.keys():
                 pantalla.blit(fondo, (0, 0))
@@ -239,7 +242,8 @@ def menu_posiciones(pantalla: pygame.Surface, fantasmas_seleccionados: list[dict
                                 fantasmas_posiciones[f["name"]] = inf_der
                                 posiciones.remove(inf_der)
                     if event.type == pygame.QUIT:
-                            return
+                            pygame.quit()
+                            return None
 
 
 def start():
@@ -247,4 +251,4 @@ def start():
     if seguir:
         fantasmas_seleccionados = menu_fantasmas(pantalla, fantasmas)
         return menu_posiciones(pantalla, fantasmas_seleccionados)
-    pygame.quit()
+    

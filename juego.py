@@ -31,7 +31,10 @@ def main():
     pygame.mixer.music.play(-1)
 
     fantasmas_y_esquinas = start()
-    ready()
+    if fantasmas_y_esquinas != None:
+        ready()
+    else: 
+        return
 
     # musica del juego: siren mientras se juega
     pygame.mixer.music.load(os.path.join('sonidos-pacman', 'pacman-siren.mp3'))
