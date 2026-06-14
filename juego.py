@@ -15,6 +15,7 @@ def main():
     pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
     pygame.init()
     pygame.mixer.init()
+    pygame.display.set_caption('Pac Man Game')
 
     pantalla = pygame.display.set_mode((560, 775))
 
