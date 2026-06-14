@@ -8,6 +8,7 @@ def main():
     from menu import start
     from game_over import game_over
     from ready import ready
+    from level import level
 
     # inicializacion de pygame -----------------------------------------------------------
     # pre_init con buffer chico = menos latencia al reproducir efectos (debe ir ANTES de pygame.init)
@@ -167,7 +168,7 @@ def main():
 
     puntaje = 0
     vidas = 3
-
+    nivel = 0
     ultimo_chequeo_puntos = 0
 
     ultimo_powerpellet_comido = 0
@@ -221,6 +222,8 @@ def main():
             if hay_puntos:
                 pass
             else:
+                nivel += 1
+                level(nivel, puntaje)
                 dic_mapa = mapa('mapa.txt', graficos_mapa)
                 jugador.posx = pac_x_inic * 20
                 jugador.posy = pac_y_inic * 20
